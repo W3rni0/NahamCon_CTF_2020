@@ -1,0 +1,997 @@
+# **NahamCon CTF 2020**
+
+<p align="center">
+  <img width=170 src="assets//images//logo.png"
+</p>
+
+This is my writeup for the challenges in NahamCon CTF, I mainly focused on cryptography, steganography and OSINT.
+***
+# Warmup
+
+## Read The Rules
+Please follow the rules for this CTF!
+
+Connect here:
+https://ctf.nahamcon.com/rules
+
+**flag{we_hope_you_enjoy_the_game}**
+
+**Solution:** By viewing at the html source of the rules page we can see the flag commented before the end of it  right after elements for the prizes:
+
+![](assets//images//read_the_rules.png)
+
+## CLIsay
+cowsay is hiding something from us!
+
+Download the file below.
+
+[clisay](assets//files/clisay)
+
+**flag{Y0u_c4n_r3Ad_M1nd5}**
+
+**Solution:**  With the challenge we are given an ELF file (a type of Unix executable), by running it we get:
+
+![](assets//images//clisay_1.png)
+
+well that didn't give us much, we can check if there are printable strings in the file by using the strings command, doing that on the file gives us the flag:
+
+![](assets//images//clisay_2.png)
+
+notice that you to append the two parts of the flag together (the strings after and before the ascii art).
+
+## Metameme
+Hacker memes. So meta.
+
+Download the file below.
+
+[hackermeme.jpg](assets//images//hackermeme.jpg)
+
+**flag{N0t_7h3_4cTuaL_Cr3At0r}**
+
+**Solution:** With the challenge we get this image:
+
+![hackermeme.jpg](assets//images//hackermeme.jpg)
+
+We can guess by the name of the challenge and its description that there is something in the metadata of the image, we can use exiftool on the image, exiftool allows you to see the metadata of the image, and by using it we get the flag:
+
+![](assets//images//metameme.png)
+
+## Mr. Robot
+Elliot needs your help. You know what to do.
+
+Connect here:\
+http://jh2i.com:50032
+
+**flag{welcome_to_robots.txt}**
+
+**Solution:** With the chellenge we get a web server to connect to:
+
+![](assets//images//mr_robot.png)
+
+There doesn't seem to be a lot of stuff in the index page, but we guess by the name of the challenge that there is something in the robots.txt file in the web server, in general robots.txt is a file which helps search engines (crawlers in general) to index the site correcrly, in most sites nowdays there is a robots.txt file, if we look at the file ( the link is http://jh2i.com:50032/robots.txt ) we get the flag:
+
+![](assets//images//mr_robot_2.png)
+
+
+## UGGC
+Become the admin!
+
+Connect here:\
+http://jh2i.com:50018
+
+**flag{H4cK_aLL_7H3_C0okI3s}**
+
+**Solution:** With the challenge we get a web-server to connect to:
+
+![](assets//images//uggc.png)
+
+It seems that we can login using the index page, by the description we know that we need to connect as admin, but if we try using admin as our username we get the following:
+
+![](assets//images//uggc_2.png)
+
+But we can login with any other username:
+
+![](assets//images//uggc_3.png)
+
+If we try to refresh the page or open it in any other tab it seems that the login is saved, which means that the site is using cookies, because http connection is stateless (doesn't save the connection server-side) and because sometimes the server needs to know the user on the other side it saves cookies on the computer of the user, cookies are data which is most of the time encrypted which is sent with http requests and helps the server recognize the user, we can see the cookies of the site by using the inspector tool in the browser:
+
+![](assets//images//uggc_4.png)
+
+we can see that the cookie stored bares a strange similarity to the username I used, that is because the cookie is encrypted using ceaser cipher, a type of substitution cipher where each letter is replaced by the letter with a specific offset from it, in our case with the offset of 13, a ceaser cipher with offset of 13 is called a rot13 cipher, now that we know the cipher of the cookie we can change our cookie to being that of the admin, for doing so we can use cyberchef:
+
+![](assets//images//uggc_5.png)
+
+now we only need to change the value of the cookie to the ciphertext corresponding to admin ( we can use the browser inspector tool for that ) and we get the flag:
+
+![](assets//images//uggc_6.png)
+
+## Easy Keesy
+Dang it, not again...
+
+Download the file below.
+
+[easy_keesy](assets//files//easy_keesy)
+
+**flag{jtr_found_the_keys_to_kingdom}**
+
+**Solution:** With the challenge we get a file with an unknown format, we can use the file command to see that the file is a keepass database:
+
+![](assets//images//easy_keesy.png)
+
+this type of files are databases used to keep passwords on the computer, there are many password manager to view this kind of files but I used KeeWeb for this challenge mostly because it is a web tool, if we try to open the file we quickly notice that we don't have the password for the file, furthermore there arent any mentions of the password in the file or in the description of the challenge, so it seems we need to bruteforce the password.\
+For crack the password I used a dictionary called rockyou.txt which lists common password and used John the Ripper, a tool for cracking passwords quickly, I first converted the file to something john can use and then used rockyou.txt to crack the password, we can do this with the following commands:
+
+```bash
+keepass2john easy_keesy > kp
+john --wordlist=/usr/share/wordlists/rockyou.txt -format:keepass kp
+```
+and by doing so we get that the password for the file is monkeys, if we use it try using it in KeeWeb we are given access to the database and we get our flag:
+
+![](assets//images//easy_keesy_1.png)
+
+
+## Pang
+
+This file does not open!
+
+Download the file below.
+
+[pang](assets//files//pang)
+
+**flag{wham_bam_thank_you_for_the_flag_maam}**
+
+**Solution:** With the challenge we get a unknown file, we can use the file command again to see that this is a PNG image, but it seems we can't open the image in an image viewer so we can guess that the image is corrupted, we can verify that by using the tool pngcheck:
+
+![](assets//images//pang_1.png)
+
+The tools tells us that there is an CRC error in the IHDR chunk, the IHDR is the first chunk in a PNG image and the CRC is a value stored for every chunk in the image to verify the authenticity of the data (I explained more about CRC and IHDR in a writeup for a challenge in RACTF 2020 listed in the resources).\
+We can fix the image by changing value of the CRC, I prefer to do it using an hex viewer, the changes are marked in red:
+
+![](assets//images//pang_2.png)
+![](assets//images//pang_3.png)
+
+and by saving the modified image and viewing it again we get the flag:
+
+![](assets//images//pang.png)
+
+***
+# OSINT
+
+## Time Keeper
+There is some interesting stuff on this website. Or at least, I thought there was...
+
+Connect here:\
+https://apporima.com/
+
+**JCTF{the_wayback_machine}**
+
+**Solution:** We are given a url of a site with the challenge, as the challenge suggests we need to look at older versions of the site, the current version is:
+
+![](assets//images//time_keeper.png)
+
+we can use a site called wayback machine (linked in resources) to view older versions, it seems that there is only one older version on site from the 18th of april, and there is a snapshot of the index page:
+
+![](assets//images//time_keeper_2.png)
+
+You can see that the first blog post from the older version can't be find in the current version, furthermore it suggests that the flag is in the web server of the site under /flag.txt, trying to view the file in the current version gives us 404 error, but if we try to view older version of it in the the wayback machine we get the flag:
+
+![](assets//images//time_keeper_3.png)
+
+
+## New Years Resolution
+This year, I resolve to not use old and deprecated nameserver technologies!
+
+Connect here: jh2i.com
+
+**flag{next_year_i_wont_use_spf}**
+
+**Solution:** We can infer from the name of the challenge and the description that it has something to do with nameservers, nameserver are servers which handle resolving human-readable identifiers to numberical identifiers, in the case of web server, nameserver handle providing responses to queries on domain names, we can view this responses using the dig command, in our case we want to view all the type of responses availiable (the more the merrier), we can do this by writing ANY after the command, the full command is
+
+`dig jh2i.com ANY`
+
+and we have our flag in the output of the command:
+
+![](assets//images//new_year_resolution.png)
+
+## Finsta
+
+This time we have a username. Can you track down `NahamConTron`?
+
+**flag{i_feel_like_that_was_too_easy}**
+
+**Solution:** In this challenge we need to track down a username, luckily there is a tool called Sherlock that does just that, it searches popular sites such as github, twitter, instegram and etc. for a user with the given username, and returns a list to the profiles, we can run it using the following command:
+
+`python3 sherlock NahamConTron`
+
+and the commands returns the following list of accounts:
+
+```
+https://www.github.com/NahamConTron
+https://www.instagram.com/NahamConTron
+https://www.liveleak.com/c/NahamConTron
+https://www.meetme.com/NahamConTron
+https://forum.redsun.tf/members/?username=NahamConTron
+https://www.twitter.com/NahamConTron
+Total Websites Username Detected On : 6
+```
+
+by looking at the instegram account we can find our flag at the accout description:
+
+![](assets//images//finsta.png)
+
+## Tron
+NahamConTron is up to more shenanigans. Find his server.
+
+**flag{nahamcontron_is_on_the_grid}**
+
+**Solution:** Taking a look back at the list Sherlock returned to us we can see that there is an account in github with this username, let's take a look at it:
+
+![](assets//images//tron_1.png)
+
+we can see that there are 2 repositories for the user:
+
+![](assets//images//tron_2.png)
+
+the second one is not really helpful:
+
+![](assets//images//tron_3.png)
+
+but the first one has some interesting files:
+
+![](assets//images//tron_4.png)
+
+the first file to pop into view is the .bash_history file, it contains the command history of a user and can reveal information about the usage of a user, in our case it contains the following line:
+```bash
+ssh -i config/id_rsa nahamcontron@jh2i.com -p 50033
+```
+so we now know the user has connected to a server using an rsa public key, and we also know that the key is in a config folder .... intesting, maybe it is the same folder as the one in the repo?
+
+![](assets//images//tron_5.png)
+
+yeah it is!, the public key is:
+
+```
+-----BEGIN OPENSSH PRIVATE KEY-----
+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
+xTSB/z4XAJNBkAAAAKam9obkB4cHMxNQE=
+-----END OPENSSH PRIVATE KEY-----
+```
+
+and we can connect to the server, using the same command, and in the server we find our flag:
+
+![](assets//images//tron_6.png)
+
+***
+# Steganography
+
+## Ksteg
+This must be a typo.... it was kust one letter away!
+
+Download the file below.
+
+[luke.jpg](assets//images//luke.jpg)
+
+**flag{yeast_bit_steganography_oops_another_typo}**
+
+**Solution:** With the challenge we get the following JPEG image:
+
+
+<p align="center">
+  <img src="assets//images//luke.jpg">
+</p>
+
+We can infer by the challenge name and the challenge description that we need to use Jsteg (link in the resources), this is a type of tool for hiding data in the least segnificant bit (LSB) of the image, this image is actually an image of the creator of the tool (which name is luke), I only succeeded in using the tool by running the main.go script thats in jsteg/cmd/jsteg using the following command:
+
+![](assets//images//luke_1.png)
+
+
+## Doh
+Doh! Stupid steganography...
+
+**Note, this flag is not in the usual format.**
+
+Download the file below.
+
+[doh.jpg](assets//images//doh.jpg)
+
+**JCTF{an_annoyed_grunt}**
+
+**Solution:** With the challenge we get the following JPEG image:
+
+<p align="center">
+  <img src="assets//images//doh.jpg">
+</p>
+
+because this is a stego challenge one of the first thing I do is to check if there is files embedded in the image using binwalk and steghide, luckily steghide comes to use and finds a text file in the image which actually contains the flag:
+
+![](assets//images//doh_1.png)
+
+
+## Beep Boop
+That must be a really long phone number... right?
+
+Download the file below.
+
+[flag.wav](assets//files//flag.wav)
+
+**flag{do_you_speak_the_beep_boop}**
+
+**Solution:** Now we are given for a change a WAV file (Wave audio file):
+
+<p align="center" >
+  <audio controls >
+    <source src = "assets//files//flag.wav" type = "audio/wav">
+  </audio>
+</p>
+
+We can hear key presses on the phones, this is actually DTMF (daul tone multi frequency) tones which were used to signal to the phone company that a specific key was pressed, we can actually decipher this tones using a tool called multimon-ng or using the web tool listed below, this will give as the folloiwing code:
+
+```
+46327402297754110981468069185383422945309689772058551073955248013949155635325
+
+```
+
+I tried a lot of ways to get the flag from this numbers and eventually figured out that you need to convert the numbers from decimal to hex and then from hex to ascii or alternativly use long_to_bytes from the pycryptodome module, by doing so we get the flag:
+
+![](assets//images//beep_boop.png)
+
+## Snowflake
+Frosty the Snowman is just made up of a lot of snowflakes. Which is the right one?
+
+Note, this flag is not in the usual format.
+
+Download the file below.
+
+**JCTF{gemmy_spinning_snowflake}**
+
+**Solution:** We are given a text file with the challenge, if we look at the file we can't see anything weird:
+```
+Frosty the snowman was a jolly happy soul
+With a corncob pipe and a button nose
+And two eyes made out of coal
+Frosty the snowman is a fairy tale, they say
+He was made of snow but the children know
+How he came to life one day
+There must have been some magic in
+That old silk hat they found
+For when they placed it on his head
+He began to dance around
+Oh, Frosty the snowman
+
+```
+
+but if we open the file in Notepad++ and turn on the option the show special symbol we can now see that something is off with the file:
+
+![](assets//images//snowman_1.png)
+
+this are tabs and spaces, and this type of steganography is actually SNOW (Steganographic Nature Of Whitespace), this is a type of whitespace steganography which uses Huffman encoding to compress a message and hide it in the whitespaces, we can use stegsnow tools to reveal the message but it seems that it doesn't work:
+
+![](assets//images//snowman_2.png)
+
+After a bit of trial and error I discovered that it is password protected, so I wrote a simple bash script which reads the passwords from rockyou.txt line by line and try to decrypt the data:
+
+```bash
+file=rockyou.txt
+while read -r line
+do
+        printf "\n$line "
+        stegsnow -C -Q -p "$line" frostythesnowman.txt
+done < $file
+```
+
+by using this simple bruteforce script we get that the password is ilovejohn (don't we all) and we get the flag (I redirected the script output to a file and then grepped for braces pattern):
+
+![](assets//images//snowman_3.png)
+
+
+## My Apologies
+There is a flag in my swap!
+
+Download the file below.\
+[apologies.txt](assets//files//apologies.txt)
+
+**flag_i_am_so_sorry_steg_sucks**
+
+**Solution:**  we again get a txt file with the challenge, now we can easily notice that something off with the message:
+
+```
+Tuｒｎs out the sｔｅganｏgrａｐhⅰc tｅcｈｎｉｑuｅ ｗe wｅｒｅ ｕsiｎg dⅰｄｎ'ｔ rｅalｌy mａｋe mｕcｈ ｓense.．. ｂｕｔ we ｋｅpｔ it aｎyｗａy． Oh well!
+```
+This is actually an Homoglyphs Steganography, a type of steganography which uses unicode encoding to hide a message, we can use the link in the resources to reveal the flag:
+
+![](assets//images//apologies.png)
+
+**Resources:**
+ * Twitter Secret Messages: http://holloway.co.nz/steg/
+
+***
+# Cryptography
+
+## Docxor
+My friend gave me a copy of his homework the other day... I think he encrypted it or something?? My computer won't open it, but he said the password is only four characters long...
+
+Download the file below.\
+[homework](assets//files//homework)
+
+**flag{xor_is_not_for_security}**
+
+**Solution:** We get an unknown file with the challenge, obviously from the challenge description and challenge name we know that the file is xored and that the key is of length 4, if we look at the hex dump of the file we can notice a reaccuring pattern of bytes `\x5a\x41\x99\xbb` :
+
+![](assets//images/docxor_1.png)
+
+furthermore if we analyse the frequency of the bytes in the file we get the following graph where the peaks are in \x5a, \x41, \x99 and \xbb:
+
+![](assets//images/docxor_2.png)
+
+so the key is `\x5a\x41\x99\xbb`, plugging the file into cyberchef in xorring the data with the key gives us the following zip file:
+
+[xorred_homework](assets//files//xorred_homework)
+
+this is actually not a zip file but a docx files by the folder (there are a lot of file types which are actually zip) if we open the file using Microsoft word or Libreoffice we get the flag:
+
+![](assets//images/docxor_3.png)
+
+
+## Homecooked
+I cannot get this to decrypt!
+
+Download the file below.\
+[decrypt.py](assets//files//decrypt.py)
+
+**flag{pR1m3s_4re_co0ler_Wh3n_pal1nDr0miC}**
+
+**Solution:** Now we get with the challenge a python script:
+```python 3
+import base64
+num = 0
+count = 0
+cipher_b64 = b"MTAwLDExMSwxMDAsOTYsMTEyLDIxLDIwOSwxNjYsMjE2LDE0MCwzMzAsMzE4LDMyMSw3MDIyMSw3MDQxNCw3MDU0NCw3MTQxNCw3MTgxMCw3MjIxMSw3MjgyNyw3MzAwMCw3MzMxOSw3MzcyMiw3NDA4OCw3NDY0Myw3NTU0MiwxMDAyOTAzLDEwMDgwOTQsMTAyMjA4OSwxMDI4MTA0LDEwMzUzMzcsMTA0MzQ0OCwxMDU1NTg3LDEwNjI1NDEsMTA2NTcxNSwxMDc0NzQ5LDEwODI4NDQsMTA4NTY5NiwxMDkyOTY2LDEwOTQwMDA="
+
+def a(num):
+    if (num > 1):
+        for i in range(2,num):
+            if (num % i) == 0:
+                return False
+                break
+        return True
+    else:
+        return False
+
+def b(num):
+    my_str = str(num)
+    rev_str = reversed(my_str)
+    if list(my_str) == list(rev_str):
+       return True
+    else:
+       return False
+
+
+cipher = base64.b64decode(cipher_b64).decode().split(",")
+
+while(count < len(cipher)):
+    if (a(num)):
+        if (b(num)):
+            print(chr(int(cipher[count]) ^ num), end='', flush=True)
+            count += 1
+            if (count == 13):
+                num = 50000
+            if (count == 26):
+                num = 500000
+    else:
+        pass
+    num+=1
+
+print()
+```
+
+this script is used for decrypting the cipher but it doesn't seem to work well:
+
+![](assets//images//homecooked.png)
+
+it somewhat stops printing at this point but still runs, we can guess by that the code is ennificient, we can try to understand what it does to figure out how to make it more efficient, we can see that the script decode the ciphertext from base64 to bytes, then for each byte it tries to find a value of num such that both functions a and b returns the boolean True, and xors that value with the byte, but by the 13th byte the value of num is jumped to 50000 and by the 26th byte the value of num is jumped to 500000.
+
+Now the function a checks if there are no numbers bigger then 2 and smaller then the input that divide the input without a remainder, so a checks if the input is prime.
+The function b checks if the input is equal to a the number in input in revese so b checks if the input is a palidrome.
+a return True if the number is prime and b checks if the number is a palindrome, so the values that are xorred with the bytes of the cipher are palindromic primes
+
+if we take a second look at a we can see that it is very inefficent as it checks for all the numbers that are smaller then the input if they can divide it without a remainder, we can replace it with the primality test in the sympy module, so in the end we get the less obfuscated following script:
+
+```python 3
+import base64
+import sympy
+
+num = 0
+count = 0
+cipher_b64 = b"MTAwLDExMSwxMDAsOTYsMTEyLDIxLDIwOSwxNjYsMjE2LDE0MCwzMzAsMzE4LDMyMSw3MDIyMSw3MDQxNCw3MDU0NCw3MTQxNCw3MTgxMCw3MjIxMSw3MjgyNyw3MzAwMCw3MzMxOSw3MzcyMiw3NDA4OCw3NDY0Myw3NTU0MiwxMDAyOTAzLDEwMDgwOTQsMTAyMjA4OSwxMDI4MTA0LDEwMzUzMzcsMTA0MzQ0OCwxMDU1NTg3LDEwNjI1NDEsMTA2NTcxNSwxMDc0NzQ5LDEwODI4NDQsMTA4NTY5NiwxMDkyOTY2LDEwOTQwMDA="
+
+def prime(num):
+    return sympy.isprime(num)
+
+def palindrome(num):
+    my_str = str(num)
+    rev_str = reversed(my_str)
+    if list(my_str) == list(rev_str):
+       return True
+    else:
+       return False
+
+
+cipher = base64.b64decode(cipher_b64).decode().split(",")
+
+while(count < len(cipher)):
+    if (prime(num)):
+        if (palindrome(num)):
+            print(chr(int(cipher[count]) ^ num), end='', flush=True)
+            count += 1
+            if (count == 13):
+                num = 50000
+            if (count == 26):
+                num = 500000
+    else:
+        pass
+    num+=1
+
+print()
+```
+by running this more efficient script we get the flag in a reasonable time:
+
+![](assets//images//homecooked_2.png)
+
+## Twinning
+These numbers wore the same shirt! LOL, #TWINNING!
+
+Connect with:\
+`nc jh2i.com 50013`
+
+**flag{thats_the_twinning_pin_to_win}**
+
+**Solution:** When we connect to server given we the challenge we are greeted with the following:
+
+![](assets//images//twinning_1.png)
+
+we can guess that this is an RSA encryption, I explained more about how RSA works in my writeup for RACTF 2020:
+
+> ... RSA is a public key cipher, which means that there are two keys, one that is public which is used to encrypt data, and one that is private which is used to decrpyt data, obviously there is some sort of connection between the keys but it is hard to reveal the private key from the public keys (and in this case vice versa), specificly in RSA in order to find the private key we need to solve the integer factorazition problem, which is thought to be in NP/P (this is not important for the challenge), we will call our public key e and our private key d, they posses the following attribute - d multiply by e modulo the value of (p-1) * (q-1) which we will name from now phi, is equal to 1, we will call d the modular multiplicative inverse of e and e the modular multiplicative inverse of d, futhermore if we take a plaintext message pt and raise it to the power of d and then to the power of e modulo the value of p * q, which we will name n and will be commonly given to us insted of q and p, we will get pt again (to understand why it is needed to delve into modern algebra, if n is smaller to pt then obviously we will not get pt), now with that in mind we can talk about the cipher, encrpytion in this cipher is raising the plaintext pt to the power of the public key e mod the value of n, simillarly, decryption is raising the ciphertext to the power of d mod n...
+
+and I explained why it works and how we can break the cipher:
+
+>...for that we need to talk about factors, factors are numbers which can be divided only by 1 and themself (we are only talking about whole numbers), we have discovered that there are infinitly many factors and that we can represent any number as the multiplication of factors, but, we havent discovered an efficient way to find out which factors make up a number, and some will even argue that there isn't an efficient way to do that (P vs. NP and all that), which means that if we take a big number, it will take days, months and even years to find out the factors which makes it, but, we have discovered efficient ways to find factors, so if I find 2 factors, which are favorably big, I multiply them and post the result on my feed to the public, it will take a lot of time for people to discover the factors that make up my number. But, and a big but, if they have a database of numbers and the factors that make them up they can easily find the factors for each numbers I will post, and as I explained before, if we can the factors we can easily calculate phi and consequently calculate d, the private key of RSA, and break the cipher, right now there are databases (listed below) with have the factors to all the numbers up to 60 digits (if I remember correctly), which is a lot but not enough to break modern RSA encryptions, but if we look at the challenge's parameters, we can see that n is awefully small, small enough that it most be in some databases...
+
+if we search for the value of n in factorDB, a database for the factors of numbers as I describerd we can find factors for the value of n given to us:
+
+![](assets//images//twinning_2.png)
+
+now we can write a small script which calculates phi, finds d the modular inverse for modulo phi and raise the ciphertext to the power of d (or be a script kiddie and use the RSA module):
+
+```python 3
+from Crypto.Util.number import inverse
+
+
+p = 1222229
+q = 1222231
+e = 65537
+ct = 348041806368
+n = 1493846172899
+
+phi = (p - 1) * (q - 1)
+d = inverse(e,phi)
+plain = pow(ct,d,n)
+print(plain)
+
+```
+and by running this script we get that the PIN is 3274 and by giving the PIN to the server we get the flag:
+
+![](assets//images//twinning_3.png)
+
+I guess that the challenge name and description is joking about the proximity of the primes...
+
+## Ooo-la-la
+Uwu, wow! Those numbers are fine!
+
+Download the file below.\
+[prompt.txt](assets//files//ooolala.txt)
+
+**flag{ooo_la_la_those_are_sexy_primes}**
+
+**Solution:** With the challenge we are given a text file, the text file contains the following:
+
+```
+N = 3349683240683303752040100187123245076775802838668125325785318315004398778586538866210198083573169673444543518654385038484177110828274648967185831623610409867689938609495858551308025785883804091
+e = 65537
+c = 87760575554266991015431110922576261532159376718765701749513766666239189012106797683148334771446801021047078003121816710825033894805743112580942399985961509685534309879621205633997976721084983
+```
+
+So this is another RSA challenge, we can again try to find the factors that make up the value of N, we can use factorDB again:
+
+![](assets//images//ooolala_1.png)
+
+and we have the factors, now let's recycle the script from the last challenge now with the new parameters,also now we need to convert the plaintext to ascii encoded characters we can use the function long_to_bytes from pycryptodome for that:
+
+```python 3
+from Crypto.Util.number import inverse, long_to_bytes
+
+
+p = 1830213987675567884451892843232991595746198390911664175679946063194531096037459873211879206428207
+q = 1830213987675567884451892843232991595746198390911664175679946063194531096037459873211879206428213
+e = 65537
+ct = 87760575554266991015431110922576261532159376718765701749513766666239189012106797683148334771446801021047078003121816710825033894805743112580942399985961509685534309879621205633997976721084983
+n = 3349683240683303752040100187123245076775802838668125325785318315004398778586538866210198083573169673444543518654385038484177110828274648967185831623610409867689938609495858551308025785883804091
+
+phi = (p - 1) * (q - 1)
+d = inverse(e,phi)
+plain = pow(ct,d,n)
+print(long_to_bytes(plain))
+```
+and by running the script we get the flag:
+
+![](assets//images//ooolala_2.png)
+
+## December
+This is my December...
+
+Download the file below.\
+[source.py](assets//files//source.py)     [ciphertext](assets//files//ciphertext)
+
+
+**flag{this_is_all_i_need}**
+
+**Solution:** With the challenge we get the following python 3 script:
+
+```python 3
+#!/usr/bin/env python
+
+from Crypto.Cipher import DES
+
+with open('flag.txt', 'rb') as handle:
+	flag = handle.read()
+
+padding_size = len(flag) + (8 - ( len(flag) % 8 ))
+flag = flag.ljust(padding_size, b'\x00')
+
+with open('key', 'rb') as handle:
+	key = handle.read().strip()
+
+iv = "13371337"
+des = DES.new(key, DES.MODE_OFB, iv)
+ct = des.encrypt(flag)
+
+with open('ciphertext','wb') as handle:
+	handle.write(ct)
+```
+
+and the ciphertext:
+
+```
+Ö¢oåÇ\"àT^N@]XõêiùÔ1÷UWETR^DˆžbÿÑ\*á^VAAVCç¤nÿÌIô]RTLE[ZDÝ£yÉÃ/ÍXl]RTWN7
+```
+
+We can see from the script that it uses DES, DES (Data Encryption Standard) is a type of symetric cipher that was used in the 80s and the 90s as a standard cipher, in was invented with IBM with the help of the NSA (yeah that NSA) and by the 90s we found a way to crack the DES key in a metter of hours (22 hours and 15 minutes), furthermore, this cipher has a lot of weakness, one of those are the existance of weak keys, decryption and encrpytion with this keys have the same effect and so encrypting some data twice is equivalent to decryting the encryption.
+
+we can also notice that the cipher uses OFB mode of operation in this mode of operation the plaintext is splitted to blocks of 8 bytes and for each block Mi we encrypt the encryption of the previous block (in the case of the first block we encrypt IV) and xor the new encryption with the plaintext, in a visual representation:
+
+<p align="center">
+  <img src="assets//images//december_1.png" style="background-color:white;" />
+</p>
+
+and in a format representation:
+
+<p align="center">
+  <img src="assets//images//december_2.png" style="background-color:white;" />
+</p>
+
+now we can notice the following attribute of using weak keys in this mode of operation:
+
+<p align="center">
+  <img src="assets//images//december_3.png" style="background-color:white;" />
+</p>
+
+in other word, for every block in an even position we get that the encryption with the weak keys are equal to xorring IV with the plaintext, so the plaintext for block in an even position is equal to the ciphertext xorred with IV, let's try doing that on our cipherext, we can do that using the following code:
+
+```python 3
+from Crypto.Util.strxor import strxor
+
+data = open("ciphertext",'rb').read()
+IV = "13371337"
+
+print(strxor(data,(IV * len(data))[0:len(data)].encode("utf-8")))
+```
+and we get:
+
+![](assets//images//december_4.png)
+
+it worked!, now we know that our key is a weak key, we can find a list of weak keys to DES on wikipedia and bruteforce them until we get a complete text (there are less then 100 weak keys), so for that I listed all the weak keys:
+
+[weak DES keys](assets//files//keys)
+
+and wrote the following script to crack the ciphertext:
+
+```python 3
+#!/usr/bin/env python
+
+from Crypto.Cipher import DES
+
+with open('ciphertext','rb') as handle:
+	ct = handle.read()
+
+with open('keys', 'r') as handle:
+	keys = handle.read().replace("\n"," ").split()
+	keys = [ bytes(bytearray.fromhex(key.strip())) for key in keys]
+
+iv = "13371337"
+for key in keys:
+	des = DES.new(key, DES.MODE_OFB, iv.encode('utf-8'))
+	pt = des.decrypt(ct)
+	if b'flag' in pt:
+		print(pt)
+		print(key)
+```
+and we get the flag:
+
+![](assets//images//december_5.png)
+
+
+## Respberry
+Raspberries are so tasty. I have to have more than just one!
+
+Download the file below.
+
+**flag{there_are_a_few_extra_berries_in_this_one}**
+
+**Solution:** Low value n RSA attack, 10 primes for n, alpertron to find primes:
+
+```python 3
+from Crypto.Util.number import inverse, long_to_bytes
+
+
+primes = ['2208664111', '2214452749', '2259012491', '2265830453', '2372942981', '2393757139', '2465499073', '2508863309', '2543358889', '2589229021', '2642723827', '2758626487', '2850808189', '2947867051', '2982067987', '3130932919', '3290718047', '3510442297', '3600488797', '3644712913', '3650456981', '3726115171', '3750978137', '3789130951', '3810149963', '3979951739', '4033877203', '4128271747', '4162800959', '4205130337', '4221911101', '4268160257']
+
+e = 65537
+ct = 5300731709583714451062905238531972160518525080858095184581839366680022995297863013911612079520115435945472004626222058696229239285358638047675780769773922795279074074633888720787195549544835291528116093909456225670152733191556650639553906195856979794273349598903501654956482056938935258794217285615471681
+n = 7735208939848985079680614633581782274371148157293352904905313315409418467322726702848189532721490121708517697848255948254656192793679424796954743649810878292688507385952920229483776389922650388739975072587660866986603080986980359219525111589659191172937047869008331982383695605801970189336227832715706317
+
+phi = 1
+for p in primes:
+  phi *= (int(p) - 1)
+d = inverse(e,phi)
+plain = pow(ct,d,n)
+print(long_to_bytes(plain))
+```
+
+
+***
+
+# Forensics
+
+## Microsooft
+We have to use Microsoft Word at the office!? Oof...
+
+Download the file below.
+
+**flag{oof_is_right_why_gfxdata_though}**
+
+**Solution:** open docx as zip file and look at src/oof.txt
+
+***
+
+# Mobile
+
+## Candroid
+I think I can, I think I can!
+
+Download the file below.
+
+**flag{4ndr0id_1s_3asy}**
+
+**Solution:** using grep on all the files in the apk for flag format
+
+## Simple App
+Here's a simple Android app. Can you get the flag?
+
+Download the file below
+
+**flag{3asY_4ndr0id_r3vers1ng}**
+
+**Solution:** using grep on all the files in the apk for flag format
+
+***
+# Miscellaneous
+
+## Vortex
+Will you find the flag, or get lost in the vortex?
+
+Connect here:\
+`nc jh2i.com 50017`
+
+**flag{more_text_in_the_vortex}**
+
+**Solution:** redirecting output to file for a minute, grepping flag format.
+
+## Fake file
+Wait... where is the flag?
+
+Connect here:\
+`nc jh2i.com 50026`
+
+**flag{we_should_have_been_worried_about_u2k_not_y2k}**
+
+**Solution:** there are two files in the home directory with the name ".." using grep -r you can get all the content of the files in the directory.
+
+## Alkatraz
+We are so restricted here in Alkatraz. Can you help us break out?
+
+Connect here:\
+`nc jh2i.com 50024`
+
+
+**flag{congrats_you_just_escaped_alkatraz}**
+
+**Solution:** printf is not restricted `printf '%s' "$(<flag.txt)"` to get flag
+
+## Trapped
+Help! I'm trapped!
+
+Connect here:\
+nc jh2i.com 50019
+
+**flag{you_activated_my_trap_card}**
+
+**Solution:** Trap command is catching every command except trap, set the trap to something else with `trap '<command>' debug`.
+like `trap 'cat flag.txt' debug` to get flag
+## Awkward
+No output..? Awk-o-taco.
+
+Connect here:
+`nc jh2i.com 50025`
+
+**flag{okay_well_this_is_even_more_awkward}**
+
+**Solution:** use grep to find cat all files and grep only to flag format
+
+```python 3
+import re
+from pwn import *
+from string import printable
+host, port = 'jh2i.com', 50025
+
+s = remote(host,port)
+
+name = "flag{"
+while True:
+	for c in "_" + printable:
+		command = """grep -ro "{}.*"\n """.format(name + c)
+		s.send(command)
+		response = s.recv()
+		return_code = re.findall("[0-9]+",str(response))[0]
+		if int(return_code) == 0:
+			if c != '*'
+				name += c
+				print(name)
+				break
+			else:
+				printf(name + "}")
+				break
+s.close()
+```
+
+***
+# Scripting
+
+## Rotten
+Ick, this salad doesn't taste too good!
+
+Connect with:\
+`nc jh2i.com 50034`
+
+**flag{now_you_know_your_caesars}**
+
+**Solution:** server response is ceaser cipher encrypted, code:
+
+```python 3
+from pwn import remote
+import re
+import re
+
+host, port = 'jh2i.com', 50034
+s = remote(host,port)
+
+flag = [''] * 32
+for _ in range(200):
+	question = s.recv()
+	answer = list(str(question)[2:-3])
+	for i in range(27):
+		for j in range(len(answer)):
+			if ord(answer[j]) >= ord('a') and ord(answer[j]) <= ord('z'):
+				answer[j] = chr((ord(answer[j]) - ord('a') + 1) % ( ord('z') - ord('a') + 1) + ord('a'))
+		plain = ''.join(answer)
+		if 'send back' in plain:
+			break
+
+	position = re.findall("[0-9]+",plain)
+	if len(position) > 0:
+		flag[int(position[0])] = plain[-2]
+		empty = [i for i in range(len(flag)) if flag[i] == '']
+		print(''.join(flag), end='\r\n')
+	s.send(plain)
+
+s.close()
+```
+
+## Really powerful Gnomes
+Only YOU can save the village!
+
+Connect with:
+`nc jh2i.com 50031`
+
+****
+
+**Solution:** Automate going on adven
+
+
+
+***
+
+# Web
+
+## Agent 95
+They've given you a number, and taken away your name~
+
+Connect here:\
+http://jh2i.com:50000
+
+**flag{user_agents_undercover}**
+
+**Solution:** Change User agent to Windows 95
+
+## Localghost
+BooOooOooOOoo! This spooOoOooky client-side cooOoOode sure is scary! What spoOoOoOoky secrets does he have in stooOoOoOore??
+
+Connect here:\
+http://jh2i.com:50003
+
+**JCTF{spoooooky_ghosts_in_storage}**
+
+**Solution:** In javascript code for jquerty.jscroll2 after beutifying, flag variable contains flag in bytes
+
+## Phphonebook
+Ring ring! Need to look up a number? This phonebook has got you covered! But you will only get a flag if it is an emergency!
+
+Connect here:\
+http://jh2i.com:50002
+
+****
+
+**Solution:** We have LFI, use PHP wrapper filter to base64 the file phphonebook.php, we can see a check for variable emergency, using proxy such as burpsuite to catch http requests and add the body varaiable emergency returns the flag.
