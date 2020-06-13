@@ -6,6 +6,53 @@
 
 This is my writeup for the challenges in NahamCon CTF, I mainly focused on cryptography, steganography and OSINT.
 ***
+# Table of Contents
+
+* [Warmup](#warmup)
+  - [Read The Rules](#read-the-rules)
+  - [CLIsay](#clisay)
+  - [Metameme](#metameme)
+  - [Mr.robot](#mr-robot)
+  - [UGGC](#uggc)
+  - [Easy Keesy](#easy-keesy)
+  - [Pang](#pang)
+* [OSINT](#osint)
+  - [Time Keeper](#time-keeper)
+  - [New Years Resolution](#new-years-resolution)
+  - [Finsta](#finsta)
+  - [Tron](#tron)
+* [Steganography](#steganography)
+  - [Ksteg](#ksteg)
+  - [Doh](#doh)
+  - [Beep Boop](#beep-boop)
+  - [Snowflake](#snowflake)
+  - [My Apologies](#my-apologies)
+* [Cryptography](#cryptography)
+  - [Docxor](#docxor)
+  - [Homecooked](#homecooked)
+  - [Twinning](#twinning)
+  - [Ooo-la-la](#ooo-la-la)
+  - [December](#december)
+  - [Respberry](#respberry)
+* [Forensics](#forensics)
+  - [Microsooft](#microsooft)
+* [Mobile](#mobile)
+  - [Candroid](#candroid)
+  - [Simple App](#simple-app)
+* [Miscellaneous](#miscellaneous)
+  - [Vortex](#vortex)
+  - [Fake file](#fake-file)
+  - [Alkatraz](#alkatraz)
+  - [Trapped](#trapped)
+  - [Awkward](#awkward)
+* [Scripting](#scripting)
+  - [Rotten](#rotten)
+  - [Really powerful Gnomes](#really-powerful-gnomes)
+* [Web](#web)
+  - [Agent 95](#agent-95)
+  - [Localghost](#localghost)
+  - [Phphonebook](#phphonebook)
+***
 # Warmup
 
 ## Read The Rules
@@ -992,6 +1039,6 @@ Ring ring! Need to look up a number? This phonebook has got you covered! But you
 Connect here:\
 http://jh2i.com:50002
 
-****
+**flag**
 
 **Solution:** We have LFI, use PHP wrapper filter to base64 the file phphonebook.php, we can see a check for variable emergency, using proxy such as burpsuite to catch http requests and add the body varaiable emergency returns the flag.
