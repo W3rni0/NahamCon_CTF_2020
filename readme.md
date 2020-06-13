@@ -855,7 +855,7 @@ Download the file below.
 
 ## Cow_Pie
 
-**flag:flag{this_flag_says_mooo_what_say_you}
+**flag{this_flag_says_mooo_what_say_you}**
 
 **Solution:** run strings on manure and grep for the flag
 
