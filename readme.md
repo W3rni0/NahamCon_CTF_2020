@@ -36,7 +36,6 @@ This is my writeup for the challenges in NahamCon CTF, I mainly focused on crypt
   - [Respberry](#respberry)
 * [Forensics](#forensics)
   - [Microsooft](#microsooft)
-  - [Cow Pie](#cow_pie)
 * [Mobile](#mobile)
   - [Candroid](#candroid)
   - [Simple App](#simple-app)
@@ -64,7 +63,7 @@ https://ctf.nahamcon.com/rules
 
 **flag{we_hope_you_enjoy_the_game}**
 
-**Solution:** By viewing at the html source of the rules page we can see the flag commented before the end of it  right after elements for the prizes:
+**Solution:** The flag is commented close to the end of the source for the rules pages, right after the elements of the prizes:
 
 ![](assets//images//read_the_rules.png)
 
@@ -81,11 +80,15 @@ Download the file below.
 
 ![](assets//images//clisay_1.png)
 
-well that didn't give us much, we can check if there are printable strings in the file by using the strings command, doing that on the file gives us the flag:
+well that didn't give us much, we can check if there are printable strings in the file by using the strings command on the file, doing that gives us the flag:
 
 ![](assets//images//clisay_2.png)
 
-notice that you to append the two parts of the flag together (the strings after and before the ascii art).
+notice that you need to append the two parts of the flag together (the strings after and before the ascii art).
+
+**Resources:**
+* strings man page: https://linux.die.net/man/1/strings
+* ELF file: https://en.wikipedia.org/wiki/Executable_and_Linkable_Format
 
 ## Metameme
 Hacker memes. So meta.
@@ -100,9 +103,13 @@ Download the file below.
 
 ![hackermeme.jpg](assets//images//hackermeme.jpg)
 
-We can guess by the name of the challenge and its description that there is something in the metadata of the image, we can use exiftool on the image, exiftool allows you to see the metadata of the image, and by using it we get the flag:
+We can guess by the name of the challenge and its description that there is something in the metadata of the image, so we can use exiftool on the image, exiftool allows you to see the metadata of the image, and by using it we get the flag:
 
 ![](assets//images//metameme.png)
+
+**Resources:**
+* Exif: https://en.wikipedia.org/wiki/Exif
+* exiftool: https://linux.die.net/man/1/exiftool
 
 ## Mr. Robot
 Elliot needs your help. You know what to do.
@@ -112,14 +119,16 @@ http://jh2i.com:50032
 
 **flag{welcome_to_robots.txt}**
 
-**Solution:** With the chellenge we get a web server to connect to:
+**Solution:** With the challenge we get a url to a website:
 
 ![](assets//images//mr_robot.png)
 
-There doesn't seem to be a lot of stuff in the index page, but we guess by the name of the challenge that there is something in the robots.txt file in the web server, in general robots.txt is a file which helps search engines (crawlers in general) to index the site correcrly, in most sites nowdays there is a robots.txt file, if we look at the file ( the link is http://jh2i.com:50032/robots.txt ) we get the flag:
+There doesn't seem to be a lot of stuff in the index page, but we can guess by the name of the challenge that there is something in the robots.txt file in the web server, robots.txt is a file which helps search engines (crawlers in general) to index the site correcrly, in most sites nowdays there is a robots.txt file, if we look at the file ( the link is http://jh2i.com:50032/robots.txt ) we get the flag:
 
 ![](assets//images//mr_robot_2.png)
 
+**Resources:**
+* Introduction to robots.txt: https://support.google.com/webmasters/answer/6062608?hl=en
 
 ## UGGC
 Become the admin!
@@ -133,7 +142,7 @@ http://jh2i.com:50018
 
 ![](assets//images//uggc.png)
 
-It seems that we can login using the index page, by the description we know that we need to connect as admin, but if we try using admin as our username we get the following:
+It seems that we can login to the site using the index page, by the description we know that we need to connect as admin, but if we try using admin as our username we get the following:
 
 ![](assets//images//uggc_2.png)
 
@@ -141,17 +150,23 @@ But we can login with any other username:
 
 ![](assets//images//uggc_3.png)
 
-If we try to refresh the page or open it in any other tab it seems that the login is saved, which means that the site is using cookies, because http connection is stateless (doesn't save the connection server-side) and because sometimes the server needs to know the user on the other side it saves cookies on the computer of the user, cookies are data which is most of the time encrypted which is sent with http requests and helps the server recognize the user, we can see the cookies of the site by using the inspector tool in the browser:
+If we try to refresh the page or open it in any other tab it seems that the login is saved, which means that the site is using cookies, because http connection is stateless (doesn't save the connection server-side) and because sometimes the server needs to know the user on the other side it saves cookies on the computer of the user, cookies are data which is most of the time encrypted and sent with http requests to helps the server recognize the user, we can see the cookies of the site by using the inspector tool in the browser:
 
 ![](assets//images//uggc_4.png)
 
-we can see that the cookie stored bares a strange similarity to the username I used, that is because the cookie is encrypted using ceaser cipher, a type of substitution cipher where each letter is replaced by the letter with a specific offset from it, in our case with the offset of 13, a ceaser cipher with offset of 13 is called a rot13 cipher, now that we know the cipher of the cookie we can change our cookie to being that of the admin, for doing so we can use cyberchef:
+we can see that the cookie stored bares a strange similarity to the username I used, that is because the cookie is encrypted using ceaser cipher, a type of substitution cipher where each letter is replaced by the letter with a specific offset from it, in our case with the offset of 13, a ceaser cipher with offset of 13 is called a rot13 cipher, now that we know the cipher of the cookie we can change our cookie to being that of the admin, we can use cyberchef to do that:
 
 ![](assets//images//uggc_5.png)
 
 now we only need to change the value of the cookie to the ciphertext corresponding to admin ( we can use the browser inspector tool for that ) and we get the flag:
 
 ![](assets//images//uggc_6.png)
+
+**Resources:**
+* HTTP coolie: https://en.wikipedia.org/wiki/HTTP_cookie
+* Ceaser cipher: https://en.wikipedia.org/wiki/Caesar_cipher
+* Cyberchef: https://gchq.github.io/CyberChef/
+
 
 ## Easy Keesy
 Dang it, not again...
@@ -166,20 +181,25 @@ Download the file below.
 
 ![](assets//images//easy_keesy.png)
 
-this type of files are databases used to keep passwords on the computer, there are many password manager to view this kind of files but I used KeeWeb for this challenge mostly because it is a web tool, if we try to open the file we quickly notice that we don't have the password for the file, furthermore there arent any mentions of the password in the file or in the description of the challenge, so it seems we need to bruteforce the password.\
-For crack the password I used a dictionary called rockyou.txt which lists common password and used John the Ripper, a tool for cracking passwords quickly, I first converted the file to something john can use and then used rockyou.txt to crack the password, we can do this with the following commands:
+this type of files are databases used to keep passwords on the computer, there are many password manager to view this kind of files but I used KeeWeb for this challenge mostly because it is a web tool, if we try to open the file we can quickly notice that we don't have the password for it, furthermore there aren't any mentions of the password in the file or in the description of the challenge, so it seems we need to bruteforce the password.\
+To crack the password I used a dictionary called rockyou.txt which lists common password and used John the Ripper, a tool for cracking passwords (hashes) quickly, I first converted the file to something john can use and then used rockyou.txt to crack the password by doing following commands:
 
 ```bash
 keepass2john easy_keesy > kp
 john --wordlist=/usr/share/wordlists/rockyou.txt -format:keepass kp
 ```
-and by doing so we get that the password for the file is monkeys, if we use it try using it in KeeWeb we are given access to the database and we get our flag:
+and by doing so we get that the password for the file is monkeys, if we try using it in KeeWeb we are given access to the database and we get our flag:
 
 ![](assets//images//easy_keesy_1.png)
 
+**Resources:**
+* file man page: https://linux.die.net/man/1/file
+* KeePass: https://en.wikipedia.org/wiki/KeePass
+* KeeWeb: https://keeweb.info/
+* rockyou.txt: https://wiki.skullsecurity.org/Passwords
+* John the Ripper: https://tools.kali.org/password-attacks/john
 
 ## Pang
-
 This file does not open!
 
 Download the file below.
@@ -188,12 +208,12 @@ Download the file below.
 
 **flag{wham_bam_thank_you_for_the_flag_maam}**
 
-**Solution:** With the challenge we get a unknown file, we can use the file command again to see that this is a PNG image, but it seems we can't open the image in an image viewer so we can guess that the image is corrupted, we can verify that by using the tool pngcheck:
+**Solution:** With the challenge we get a unknown file, we can use the file command to see that this is a PNG image, but it seems we can't open the image in an image viewer, so we can guess that the image is corrupted, we can verify that by using the tool pngcheck:
 
 ![](assets//images//pang_1.png)
 
-The tools tells us that there is an CRC error in the IHDR chunk, the IHDR is the first chunk in a PNG image and the CRC is a value stored for every chunk in the image to verify the authenticity of the data (I explained more about CRC and IHDR in a writeup for a challenge in RACTF 2020 listed in the resources).\
-We can fix the image by changing value of the CRC, I prefer to do it using an hex viewer, the changes are marked in red:
+The tool tells us that there is an CRC error in the IHDR chunk, the IHDR is the first chunk in a PNG image and the CRC value is a value stored for every chunk in the image to verify the authenticity of the data (I explained more about CRC and IHDR in my writeup for the challenges in RACTF 2020 listed in the resources).\
+We can fix the image by changing value of the CRC, I prefer to do it using an hex viewer so we can have a clear understaing of the data, the changes are marked in red:
 
 ![](assets//images//pang_2.png)
 ![](assets//images//pang_3.png)
@@ -201,6 +221,12 @@ We can fix the image by changing value of the CRC, I prefer to do it using an he
 and by saving the modified image and viewing it again we get the flag:
 
 ![](assets//images//pang.png)
+
+**Resources:**
+* pngcheck man page: https://man.cx/pngcheck(1)
+* PNG file format specification: http://www.libpng.org/pub/png/spec/1.2/PNG-Contents.html
+* RACTF 2020 writeup for stego challenges: https://github.com/W3rni0/RACTF_2020#steg--forensics
+* HxD: https://mh-nexus.de/en/hxd/
 
 ***
 # OSINT
@@ -292,11 +318,11 @@ the first file to pop into view is the .bash_history file, it contains the comma
 ```bash
 ssh -i config/id_rsa nahamcontron@jh2i.com -p 50033
 ```
-so we now know the user has connected to a server using an rsa public key, and we also know that the key is in a config folder .... intesting, maybe it is the same folder as the one in the repo?
+so we now know the user has connected to a server using an SSH private key, and we also know that the key is in a config folder .... intesting, maybe it is the same folder as the one in the repo?
 
 ![](assets//images//tron_5.png)
 
-yeah it is!, the public key is:
+yeah it is!, the private key is:
 
 ```
 -----BEGIN OPENSSH PRIVATE KEY-----
@@ -852,12 +878,6 @@ Download the file below.
 **flag{oof_is_right_why_gfxdata_though}**
 
 **Solution:** open docx as zip file and look at src/oof.txt
-
-## Cow_Pie
-
-**flag{this_flag_says_mooo_what_say_you}**
-
-**Solution:** run strings on manure and grep for the flag
 
 ***
 
