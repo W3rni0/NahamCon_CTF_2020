@@ -1003,10 +1003,49 @@ Only YOU can save the village!
 Connect with:
 `nc jh2i.com 50031`
 
-****
+**Solution:** Automate going on adventure and buying weapons:
 
-**Solution:** Automate going on adven
+```python 3
+from pwn import *
+import re
 
+prices = [1000,2000,10000,100000,10000]
+gold = 0
+
+def beautify_data(msg):
+	return str(msg)[2:-1].replace("\\n","\n")
+
+
+host, port = 'jh2i.com', 50031
+s = remote(host,port)
+
+for i in range(5):
+	response = beautify_data(s.recv())
+	if "flag" in response:
+		print(re.findall("flag{.*?}",response)[0])
+		exit(0)
+
+
+	s.send("6\n{}\n".format(i + 1))
+	while int(gold) < prices[i]:
+		response = beautify_data(s.recv())
+		if "flag" in response:
+			print(re.findall("flag{.*?}",response)[0])
+			exit(0)
+
+		gold = re.findall("[0-9]+",response)[1]
+		print("gold: " + gold)
+		s.send("{}\n".format(5 - i))
+
+
+
+s.send("1\n")
+if "flag" in response:
+	print(re.findall("flag{.*?}",response)[0])
+
+s.interactive()
+s.close()
+```
 
 
 ***
