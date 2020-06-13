@@ -36,6 +36,7 @@ This is my writeup for the challenges in NahamCon CTF, I mainly focused on crypt
   - [Respberry](#respberry)
 * [Forensics](#forensics)
   - [Microsooft](#microsooft)
+  - [Cow Pie](#cow_pie)
 * [Mobile](#mobile)
   - [Candroid](#candroid)
   - [Simple App](#simple-app)
@@ -851,6 +852,12 @@ Download the file below.
 **flag{oof_is_right_why_gfxdata_though}**
 
 **Solution:** open docx as zip file and look at src/oof.txt
+
+## Cow_Pie
+
+**flag:flag{this_flag_says_mooo_what_say_you}
+
+**Solution:** run strings on manure and grep for the flag
 
 ***
 
