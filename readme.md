@@ -15,6 +15,7 @@ This is my writeup for the challenges in NahamCon CTF, I mainly focused on crypt
   - [Mr.robot](#mr-robot)
   - [UGGC](#uggc)
   - [Easy Keesy](#easy-keesy)
+  - [Peter Rabbit](#peter-rabbit)
   - [Pang](#pang)
 * [OSINT](#osint)
   - [Time Keeper](#time-keeper)
@@ -27,6 +28,9 @@ This is my writeup for the challenges in NahamCon CTF, I mainly focused on crypt
   - [Beep Boop](#beep-boop)
   - [Snowflake](#snowflake)
   - [My Apologies](#my-apologies)
+  - [Dead Swap](#dead-swap)
+  - [Walkman](#walkman)
+  - [Old School](#old-school)
 * [Cryptography](#cryptography)
   - [Docxor](#docxor)
   - [Homecooked](#homecooked)
@@ -201,6 +205,31 @@ and by doing so we get that the password for the file is monkeys, if we try usin
 * rockyou.txt: https://wiki.skullsecurity.org/Passwords
 * John the Ripper: https://tools.kali.org/password-attacks/john
 
+## Peter Rabbit
+**Post-CTF**
+Little Peter Rabbit had a fly upon his nose, and he flipped it and he flapped it and it flew away!
+
+Download the file below.\
+[peter.png](assets//images//peter.png)
+
+**flag{ohhhpietwastherabbit}**
+
+**Solution:** With the challenge we are given the following PNG image:
+
+![](assets//images//peter.png)
+
+this is actually an esoteric programming language called piet, named after the artist Piet Mondrian, we can use an interpreter to execute the script, I used the one linked below, by using it we get the flag:
+
+![](assets//images//peter_2.png)
+
+
+**Resources:**
+* Piet: https://www.dangermouse.net/esoteric/piet.html
+* Esotaric Programming Language: https://en.wikipedia.org/wiki/Esoteric_programming_language
+* Piet online interpreter: https://www.bertnase.de/npiet/npiet-execute.php
+
+
+
 ## Pang
 This file does not open!
 
@@ -307,6 +336,7 @@ by looking at the instegram account we can find our flag at the accout descripti
 
 
 ## Tron
+
 NahamConTron is up to more shenanigans. Find his server.
 
 **flag{nahamcontron_is_on_the_grid}**
@@ -535,6 +565,76 @@ This is actually an Homoglyphs Steganography, a type of steganography which uses
 
 **Resources:**
  * Twitter Secret Messages: http://holloway.co.nz/steg/
+
+## Dead Swap
+There is a flag in my swap!
+
+Download the file below.\
+[deadswap](assets//files//deadswap)
+
+**PostCTF**
+
+**flag{what_are_you_doing_in_my_swap}**
+
+**Solution:** With the challenge we are given a file from an unknown type, by using xxd on the file we it seems that we only have \xff bytes:
+
+![](assets//images//deadswap_1.png)
+
+but by grepping for everything but \xff bytes we can see thet there are \xfe bytes too:
+
+![](assets//images//deadswap_2.png)
+
+during the CTF I tried using binary by mapping 1 and 0 to f and e but the solution is actually to map 1 and 0 to fe and ff, this will give us a binary string, encoding the string to ascii we get the flag in reverse, so I wrote a one-liner to do all that (and it's amazing):
+
+`xxd deadswap | grep -v "ffff ffff ffff ffff ffff ffff ffff ffff" | cut -d " " -f 2-10 | sed "s/ff/0/g" | sed "s/fe/1/g" | tr -d " \n" | python3 -c "import binascii; print(binascii.unhexlify('%x' % int(input(),2)));" | rev`
+
+the one-liner prints the hexdump of the file, greps for lines which contains interesting data, cut only the columns with the hex data, replaces ff and fe with 0 and 1 (using sed), removes new-lines, convert the data from binary to ascii using python and reverses the string, and in action:
+
+![](assets//images//deadswap_3.png)
+
+## Walkman
+Do you hear the flag? Maybe if you walk through it one step at a time.
+
+Download the file below.\
+[wazaa.wav](assets//files//wazaa.wav)
+
+**PostCTF**
+
+**flag{do_that_bit_again}**
+
+**Solution:** We are given a WAV file with the challenge, I personaly hate steganography that is related to audio, if it is not spectogram and wavsteg can't find it I just quit...but i'm a comlpetionist, so i'll cover that as well, we need to use wav-steg-py tool listed in the resources with the next command:
+
+`python3 wav-steg.py -r -s wazaaa.wav -o a -n 1 -b 1000`
+
+in action:
+
+![](assets//images//walkman.png)
+
+this tool uses the least significant bit to hide data (which wavsteg also do so i'm not sure why this worked), it is quite common to hide data in the LSB of the file so this type of this are really handy.
+
+**Resources:**
+* wav-steg-py: https://github.com/pavanchhatpar/wav-steg-py
+
+## Old School
+Did Dade Murphy do this?
+
+Note, this flag is not in the usual format
+
+Download the file below.\
+[hackers.bmp](assets//files//hackers.bmp)
+
+**PostCTF**
+
+**JCTF{at_least_the_movie_is_older_than_this_software}**
+
+**Solution:** With the challenge we are given a bitmap (bmp) file, this a quite old file format and rarely used today as the compression algorithm is really not good and rarely supported so it is not very efficient in space to use a bmp file format for  images, especially if you consider the image quality nowdays, this flag is again hidden in the least significant bits of the image and again I tried using stegolsb during the CTF and got nothing, a smarter approche is to use zsteg, this tool checks all the availiable channels and even in the most significant bit for hidden data (I actually forgot I have this tool), we can get the flag using the following command:
+
+`zsteg -a hackers.bmp`
+
+and in action:
+
+![](assets//images//oldschool.png)
+
 
 ***
 # Cryptography
@@ -1021,7 +1121,7 @@ Connect here:\
 
 ![](assets//images//fake_file.png)
 
-seems that there are two files with the name '..' but using regular command like cat on the file won't work I eventually tried to use `grep -r .` to recursively grep the file in the directory, and we get the flag (or we could just get all the flags https://tildeho.me/leaking-all-flags-in-a-ctf/):
+seems that there are two files with the name '..' but using regular command like cat on the file won't work I eventually tried to use `grep -r .` to recursively grep the file in the directory, and we get the flag (or we could just get all the flags like this guy https://tildeho.me/leaking-all-flags-in-a-ctf/):
 
 ![](assets//images//fake_file_2.png)
 
@@ -1215,7 +1315,7 @@ Ring ring! Need to look up a number? This phonebook has got you covered! But you
 Connect here:\
 http://jh2i.com:50002
 
-**flag**
+**flag{phon3_numb3r_3xtr4ct3d}**
 
 **Solution:** With the challenge we are given a website with the following index page:
 
