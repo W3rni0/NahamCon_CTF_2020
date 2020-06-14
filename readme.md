@@ -1220,19 +1220,19 @@ http://jh2i.com:50002
 
 ![](assets//images//phphonebook_1.png)
 
-so the site tells us that the php source for the page accepts parameters...oooh we might have LFI (local file inclusion), php allows the inclusion of files from the server as parameters in order to extend the functionality of the code or to use code from other files, but if the code is not sanitising the input (filtering out sensitive files) an attacker can include any arbitrary file on the web server as the input or atleast read the php code in the current directory, this code stays in the setver-side and should never be revealed to the client-side as it may contain sensitive data (and there is no use to it in client-side), but if we want to read php files we'll need to encode or encrypt the data as the LFI vulnrable php code will read the file as code and execute it, we can do such things using the php://filter wrapper, we can use this wrapper in the following way to leak the php code for index page index.php:
+so the site tells us that the php source for the page accepts parameters...oooh we might have LFI (local file inclusion), php allows the inclusion of files from the server as parameters in order to extend the functionality of the script or to use code from other files, but if the script is not sanitising the input as needed (filtering out sensitive files) an attacker can include any arbitrary file on the web server or atleast use what's not filtered to his adventage, php scripts stay in the server-side and should not be revealed to the client-side as it may contain sensitive data (and there is no use to it in the client-side), if we want to leak the php files we'll need to encode or encrypt the data as the LFI vulnrable php code will read the file as code and execute it, we can do such things using the php://filter wrapper, using this wrapper in the following way will leak the php source code for index page:
 
 `http://jh2i.com:50002/index.php?file=php://filter/convert.base64-encode/resource=index.php`
 
-by going to this url we get the file base64 encoded:
+and by going to this url we get the file base64 encoded:
 
 ![](assets//images//phphonebook_2.png)
 
 ```
 PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KICA8aGVhZD4KICAgIDxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4KICAgIDx0aXRsZT5QaHBob25lYm9vazwvdGl0bGU+CiAgICA8bGluayBocmVmPSJtYWluLmNzcyIgcmVsPSJzdHlsZXNoZWV0Ij4KICA8L2hlYWQ+CiAgPGJvZHk+Cgk8P3BocAoJCSRmaWxlPSRfR0VUWydmaWxlJ107CgkJaWYoIWlzc2V0KCRmaWxlKSkKCQl7CgkJCWVjaG8gIlNvcnJ5ISBZb3UgYXJlIGluIC9pbmRleC5waHAvP2ZpbGU9IjsKCQl9IGVsc2UKCQl7CgkJCWluY2x1ZGUoc3RyX3JlcGxhY2UoJy5waHAnLCcnLCRfR0VUWydmaWxlJ10pLiIucGhwIik7CgkJCWRpZSgpOwoJCX0KCT8+CgkgIAk8cD5UaGUgcGhvbmVib29rIGlzIGxvY2F0ZWQgYXQgPGNvZGU+cGhwaG9uZWJvb2sucGhwPC9jb2RlPjwvcD4KCjxkaXYgc3R5bGU9InBvc2l0aW9uOmZpeGVkOyBib3R0b206MSU7IGxlZnQ6MSU7Ij4KPGJyPjxicj48YnI+PGJyPgo8Yj4gTk9UIENIQUxMRU5HRSBSRUxBVEVEOjwvYj48YnI+VEhBTksgWU9VIHRvIElOVElHUklUSSBmb3Igc3VwcG9ydGluZyBOYWhhbUNvbiBhbmQgTmFoYW1Db24gQ1RGIQo8cD4KPGltZyB3aWR0aD02MDBweCBzcmM9Imh0dHBzOi8vZDI0d3VxNm85NTFpMmcuY2xvdWRmcm9udC5uZXQvaW1nL2V2ZW50cy9pZC80NTcvNDU3NzQ4MTIxL2Fzc2V0cy9mN2RhMGQ3MThlYjc3YzgzZjVjYjYyMjFhMDZhMmY0NS5pbnRpLnBuZyI+CjwvcD4KPC9kaXY+CgogIDwvYm9keT4KIDwvaHRtbD4=
 ```
+and decoding this from base64 gives us the code:
 
-and decoding from base64 gives us the code:
 ```php
 <!DOCTYPE html>
 <html lang="en">
@@ -1264,10 +1264,10 @@ and decoding from base64 gives us the code:
 </div>
 
   </body>
- </html>
+</html>
 ```
 
-By the way we can now tell by this line `include(str_replace('.php','',$_GET['file']).".php");` that we only link php files as the code removes the php extension from the file if there is one and then appends a php extension to it, I think that there are ways to go around this but it is not important for this challenge, doing the same for phphonebook.php gives us this code:
+we can now tell by this line `include(str_replace('.php','',$_GET['file']).".php");` that we only leak php files as the code removes the php extension from the file given as input (if there is one) and then appends a php extension to it, I think that there are ways to go around this but it is not important for this challenge, doing the same for phphonebook.php gives us this code:
 
 ```php
 <!DOCTYPE html>
@@ -1325,8 +1325,8 @@ By the way we can now tell by this line `include(str_replace('.php','',$_GET['fi
   </body>
 </html>
 ```
-
-we can see that by the end of this code there is a php segmant where extract is used on $_POST and then there is a check if $emergency is set, if so the code echoes the content of a file called flag.txt, this is really intesting, I'll explain the gist of it mainly because i'm not so strong at PHP, the $_POST is an array of variables passed to the script when an HTTP POST request is sent to the file (we commonly use 2 type of HTTP request, POST and GET, where GET asks from the server to return something for example the source for a page, and POST also sends variables to the server in the request body), the extract method extracts the variables from the array where the variable name is set to the name passed in the HTTP request and the value is the corresponding value, isset just checks if there is a variable with this name, by all this we can infer that we need to send a POST request to the server with a variable named emergency which has some arbitrary value in order to get the server to print the flag, we can do so using curl or using a proxy like burp suite like I will show first, we need to set burp suite as our proxy and send a post request to the server, we can do such that using the submit button in the phphonebook page:
+by the end of the code there is a php segmant where the method extract is used on $_POST and then there is a check if $emergency is set, if so the code echoes the content of a file called flag.txt.\
+this is really intesting, I'll explain the gist of it mainly because i'm not so strong at php, the $_POST is the array of variables passed to the script when an HTTP POST request is sent to it (we commonly use 2 type of HTTP request, POST and GET, where GET asks from the server to return some resource for example the source for a page, and POST also sends variables to a file in the server in the request body), the extract method extracts the variables from the array, the extracted variable name is set to the name passed in the HTTP request and the value is set to the corresponding value, the isset method just checks if there is a variable with this name, by all this we can infer that we need to send a POST request to the server with a variable named emergency which has some arbitrary value in order to get the server to print the flag, we can do so using curl or using a proxy like burp suite like I will show first, we need to set burp suite as our proxy and send a post request to the server, we can do such that using the submit button in the phphonebook page:
 
 ![](assets//images//phphonebook_3.png)
 
