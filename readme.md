@@ -39,6 +39,7 @@ This is my writeup for the challenges in NahamCon CTF, I mainly focused on crypt
 * [Mobile](#mobile)
   - [Candroid](#candroid)
   - [Simple App](#simple-app)
+  - [Ends Meet](#ends-meet)
 * [Miscellaneous](#miscellaneous)
   - [Vortex](#vortex)
   - [Fake file](#fake-file)
@@ -901,6 +902,15 @@ Download the file below
 
 **Solution:** using grep on all the files in the apk for flag format
 
+## Ends Meet
+Are you a true mobile hacker?
+
+Download the file below.
+
+**flag{rev3rsIng_ApKs_l1k3_A_Pr0}**
+
+**Solution:** open the apk file in jadx-gui and get a base64 encoded url in the `MainActivity` and visit the page with useragent `volley/0`
+
 ***
 # Miscellaneous
 
@@ -1029,6 +1039,8 @@ Only YOU can save the village!
 
 Connect with:
 `nc jh2i.com 50031`
+
+**flag{it_was_in_fact_you_that_was_really_powerful}**
 
 **Solution:** Automate going on adventure and buying weapons:
 
