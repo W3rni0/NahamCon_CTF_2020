@@ -206,11 +206,12 @@ and by doing so we get that the password for the file is monkeys, if we try usin
 * John the Ripper: https://tools.kali.org/password-attacks/john
 
 ## Peter Rabbit
-**Post-CTF**
 Little Peter Rabbit had a fly upon his nose, and he flipped it and he flapped it and it flew away!
 
 Download the file below.\
 [peter.png](assets//images//peter.png)
+
+**Post-CTF**
 
 **flag{ohhhpietwastherabbit}**
 
