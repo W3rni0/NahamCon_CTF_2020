@@ -977,7 +977,7 @@ Download the file below.\
 
 **Solution:** same as previous challenge:
 
-![](assets/simple_app.png)
+![](assets//images//simple_app.png)
 
 ## Ends Meet
 Are you a true mobile hacker?
