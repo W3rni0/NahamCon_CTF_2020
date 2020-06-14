@@ -36,6 +36,7 @@ This is my writeup for the challenges in NahamCon CTF, I mainly focused on crypt
   - [Respberry](#respberry)
 * [Forensics](#forensics)
   - [Microsooft](#microsooft)
+  - [Cow Pie](#cow-pie)
 * [Mobile](#mobile)
   - [Candroid](#candroid)
   - [Simple App](#simple-app)
@@ -248,10 +249,12 @@ we can use a site called wayback machine (linked in resources) to view older ver
 
 ![](assets//images//time_keeper_2.png)
 
-You can see that the first blog post from the older version can't be find in the current version, furthermore it suggests that the flag is in the web server of the site under /flag.txt, trying to view the file in the current version gives us 404 error, but if we try to view older version of it in the the wayback machine we get the flag:
+You can see that the first blog post from the older version can't be found in the current version, furthermore it suggests that the flag is in the web server of the site under /flag.txt, trying to view the file in the current version gives us 404 error, but if we try to view older version of it in the the wayback machine we get the flag:
 
 ![](assets//images//time_keeper_3.png)
 
+**Resources:**
+* Wayback Machine: https://archive.org/web/
 
 ## New Years Resolution
 This year, I resolve to not use old and deprecated nameserver technologies!
@@ -260,7 +263,7 @@ Connect here: jh2i.com
 
 **flag{next_year_i_wont_use_spf}**
 
-**Solution:** We can infer from the name of the challenge and the description that it has something to do with nameservers, nameserver are servers which handle resolving human-readable identifiers to numberical identifiers, in the case of web server, nameserver handle providing responses to queries on domain names, we can view this responses using the dig command, in our case we want to view all the type of responses availiable (the more the merrier), we can do this by writing ANY after the command, the full command is
+**Solution:** We can infer from the name of the challenge and the description that it has something to do with nameservers, nameserver are servers which handle resolving human-readable identifiers to numberical identifiers, in the case of web server, nameserver handle providing responses to queries on domain names, we can view this responses using the dig command, in our case we want to view all the type of responses availiable (the more the merrier), we can do this by writing ANY after the command, the full command is:
 
 `dig jh2i.com ANY`
 
@@ -268,13 +271,18 @@ and we have our flag in the output of the command:
 
 ![](assets//images//new_year_resolution.png)
 
+**Resources:**
+* Name server: https://en.wikipedia.org/wiki/Name_server
+* DNS protocol: https://tools.ietf.org/html/rfc1034
+* dig man tool: https://linux.die.net/man/1/dig
+
 ## Finsta
 
 This time we have a username. Can you track down `NahamConTron`?
 
 **flag{i_feel_like_that_was_too_easy}**
 
-**Solution:** In this challenge we need to track down a username, luckily there is a tool called Sherlock that does just that, it searches popular sites such as github, twitter, instegram and etc. for a user with the given username, and returns a list to the profiles, we can run it using the following command:
+**Solution:** In this challenge we need to track down a username, luckily there is a tool called Sherlock that does just that, it searches popular sites such as github, twitter, instegram and etc. for an account with the given username, and returns a list to the profiles, we can run it using the following command:
 
 `python3 sherlock NahamConTron`
 
@@ -294,20 +302,24 @@ by looking at the instegram account we can find our flag at the accout descripti
 
 ![](assets//images//finsta.png)
 
+**Resources:**
+* Sherlock: https://github.com/sherlock-project/sherlock
+
+
 ## Tron
 NahamConTron is up to more shenanigans. Find his server.
 
 **flag{nahamcontron_is_on_the_grid}**
 
-**Solution:** Taking a look back at the list Sherlock returned to us we can see that there is an account in github with this username, let's take a look at it:
+**Solution:** Taking a look back at the list Sherlock returned we can see that there is an account in github with this username, let's take a look at it:
 
 ![](assets//images//tron_1.png)
 
-we can see that there are 2 repositories for the user:
+there are 2 repositories for the user:
 
 ![](assets//images//tron_2.png)
 
-the second one is not really helpful:
+the second one is not very helpful:
 
 ![](assets//images//tron_3.png)
 
@@ -315,7 +327,7 @@ but the first one has some interesting files:
 
 ![](assets//images//tron_4.png)
 
-the first file to pop into view is the .bash_history file, it contains the command history of a user and can reveal information about the usage of a user, in our case it contains the following line:
+the first file to pop into view is the .bash_history file, it contains the command history of a user and can reveal sensitive information about user activity, in our case it contains the following line:
 ```bash
 ssh -i config/id_rsa nahamcontron@jh2i.com -p 50033
 ```
@@ -389,10 +401,12 @@ Download the file below.
   <img src="assets//images//luke.jpg">
 </p>
 
-We can infer by the challenge name and the challenge description that we need to use Jsteg (link in the resources), this is a type of tool for hiding data in the least segnificant bit (LSB) of the image, this image is actually an image of the creator of the tool (which name is luke), I only succeeded in using the tool by running the main.go script thats in jsteg/cmd/jsteg using the following command:
+We can infer by the challenge name and the challenge description that we need to use Jsteg (link in the resources), this is a type of tool for hiding data in the least segnificant bit (LSB) of the bytes in the image, this image is actually an image of the creator of the tool (whose name is luke), I only succeeded in using the tool by running the main.go script thats in jsteg/cmd/jsteg using the following command:
 
 ![](assets//images//luke_1.png)
 
+**Resources:**
+* Jsteg: https://github.com/lukechampine/jsteg
 
 ## Doh
 Doh! Stupid steganography...
@@ -415,6 +429,10 @@ because this is a stego challenge one of the first thing I do is to check if the
 
 ![](assets//images//doh_1.png)
 
+**Resources:**
+* Steghide: http://steghide.sourceforge.net/
+* binwalk man page: https://manpages.debian.org/stretch/binwalk/binwalk.1.en.html
+
 
 ## Beep Boop
 That must be a really long phone number... right?
@@ -425,24 +443,24 @@ Download the file below.
 
 **flag{do_you_speak_the_beep_boop}**
 
-**Solution:** Now we are given for a change a WAV file (Wave audio file):
-
-<p align="center" >
-  <audio controls >
-    <source src = "assets//files//flag.wav" type = "audio/wav">
-  </audio>
-</p>
-
-We can hear key presses on the phones, this is actually DTMF (daul tone multi frequency) tones which were used to signal to the phone company that a specific key was pressed, we can actually decipher this tones using a tool called multimon-ng or using the web tool listed below, this will give as the folloiwing code:
+**Solution:** Now we are given for a change a WAV file (Wave audio file),In it we can hear key presses of a phone, this is actually DTMF (daul tone multi frequency) which were used to signal to the phone company that a specific key was pressed, we can actually decipher this tones using a tool called multimon-ng or using the web tool listed below, this will give us the folloiwing code:
 
 ```
 46327402297754110981468069185383422945309689772058551073955248013949155635325
 
 ```
+you can use the command the following command to extract the number:
 
-I tried a lot of ways to get the flag from this numbers and eventually figured out that you need to convert the numbers from decimal to hex and then from hex to ascii or alternativly use long_to_bytes from the pycryptodome module, by doing so we get the flag:
+`multimon-ng -t wav -a DTMF flag.wav | grep -o "[0-9]+" | tr -d "\n"`
+
+I tried a lot of ways to get the flag from this number and eventually figured out that you need to convert the numbers from decimal to hex and then from hex to ascii, or alternativly use long_to_bytes from the pycryptodome module, by doing so we get the flag:
 
 ![](assets//images//beep_boop.png)
+
+**Resources:**
+* DTMF: https://en.wikipedia.org/wiki/Dual-tone_multi-frequency_signaling
+* multimon-ng: https://tools.kali.org/wireless-attacks/multimon-ng
+* Web DTMF decoder: http://dialabc.com/sound/detect/index.html
 
 ## Snowflake
 Frosty the Snowman is just made up of a lot of snowflakes. Which is the right one?
@@ -473,7 +491,7 @@ but if we open the file in Notepad++ and turn on the option the show special sym
 
 ![](assets//images//snowman_1.png)
 
-this are tabs and spaces, and this type of steganography is actually SNOW (Steganographic Nature Of Whitespace), this is a type of whitespace steganography which uses Huffman encoding to compress a message and hide it in the whitespaces, we can use stegsnow tools to reveal the message but it seems that it doesn't work:
+these are tabs and spaces, and this type of steganography is actually SNOW (Steganographic Nature Of Whitespace), it is a type of whitespace steganography which uses Huffman encoding to compress a message and hide it in the whitespaces, we can use stegsnow tools to reveal the message but it seems that it doesn't work:
 
 ![](assets//images//snowman_2.png)
 
@@ -492,16 +510,21 @@ by using this simple bruteforce script we get that the password is ilovejohn (do
 
 ![](assets//images//snowman_3.png)
 
+**Resources:**
+* SNOW: http://www.darkside.com.au/snow/
+* stegsnow man page: http://manpages.ubuntu.com/manpages/bionic/man1/stegsnow.1.html
 
 ## My Apologies
-There is a flag in my swap!
+Nothing witty to say here... just that I am sorry.
+
+Note, this flag is not in the usual format.
 
 Download the file below.\
 [apologies.txt](assets//files//apologies.txt)
 
 **flag_i_am_so_sorry_steg_sucks**
 
-**Solution:**  we again get a txt file with the challenge, now we can easily notice that something off with the message:
+**Solution:** We again get a txt file with the challenge, now we can easily notice that something off with the message:
 
 ```
 Tuｒｎs out the sｔｅganｏgrａｐhⅰc tｅcｈｎｉｑuｅ ｗe wｅｒｅ ｕsiｎg dⅰｄｎ'ｔ rｅalｌy mａｋe mｕcｈ ｓense.．. ｂｕｔ we ｋｅpｔ it aｎyｗａy． Oh well!
@@ -532,11 +555,17 @@ furthermore if we analyse the frequency of the bytes in the file we get the foll
 
 ![](assets//images/docxor_2.png)
 
-so the key is `\x5a\x41\x99\xbb`, plugging the file into cyberchef in xorring the data with the key gives us the following zip file:
+but if we look at a regular PNG file or Zip file we get the following bytes frequency:
+
+![](assets//images/docxor_4.png)
+
+we can notice that regulary the \x00 byte is the most frequent, so if the key is xor with the data all of the \x00 bytes will be mapped to the bytes of the key.
+
+so we can infer that key is `\x5a\x41\x99\xbb`, plugging the file into cyberchef in xorring the data with the key gives us the following zip file:
 
 [xorred_homework](assets//files//xorred_homework)
 
-this is actually not a zip file but a docx files by the folder (there are a lot of file types which are actually zip) if we open the file using Microsoft word or Libreoffice we get the flag:
+this is actually not a zip file but a docx file by the folders in it (there are a lot of file types which are actually zip) if we open the file using Microsoft word or Libreoffice we get the flag:
 
 ![](assets//images/docxor_3.png)
 
@@ -597,13 +626,13 @@ this script is used for decrypting the cipher but it doesn't seem to work well:
 
 ![](assets//images//homecooked.png)
 
-it somewhat stops printing at this point but still runs, we can guess by that the code is ennificient, we can try to understand what it does to figure out how to make it more efficient, we can see that the script decode the ciphertext from base64 to bytes, then for each byte it tries to find a value of num such that both functions a and b returns the boolean True, and xors that value with the byte, but by the 13th byte the value of num is jumped to 50000 and by the 26th byte the value of num is jumped to 500000.
+it somewhat stops printing at this point but still runs, we can guess by that the code is inefficient, we can try to understand what it does to figure out how to make it more efficient, we can see that the script decode the ciphertext from base64 to bytes, then for each byte in the ciphertext it tries to find a value of next value of num such that both functions a and b returns a boolean value of True, and xors that value with the value of the byte and prints the result, but by the 13th byte the value of num is jumped to 50000 and by the 26th byte the value of num is jumped to 500000.
 
-Now the function a checks if there are no numbers bigger then 2 and smaller then the input that divide the input without a remainder, so a checks if the input is prime.
+let's look at the functions, a checks if there are no numbers bigger then 2 and smaller then the input that divide the input without a remainder, so a checks if the input is prime.
 The function b checks if the input is equal to a the number in input in revese so b checks if the input is a palidrome.
 a return True if the number is prime and b checks if the number is a palindrome, so the values that are xorred with the bytes of the cipher are palindromic primes
 
-if we take a second look at a we can see that it is very inefficent as it checks for all the numbers that are smaller then the input if they can divide it without a remainder, we can replace it with the primality test in the sympy module, so in the end we get the less obfuscated following script:
+if we take a second look at the function a we can see that it is very inefficent as it checks for all the numbers that are smaller then the input if they can divide it without a remainder, we can replace it with the primality test in the sympy module, which uses an efficient method (Rabin-Miller Strong Pseudoprime Test), in the end we get the less obfuscated following script:
 
 ```python 3
 import base64
@@ -642,7 +671,7 @@ while(count < len(cipher)):
 
 print()
 ```
-by running this more efficient script we get the flag in a reasonable time:
+and by running this more efficient script we get the flag in a reasonable time:
 
 ![](assets//images//homecooked_2.png)
 
@@ -842,11 +871,22 @@ and we get the flag:
 ## Respberry
 Raspberries are so tasty. I have to have more than just one!
 
-Download the file below.
+Download the file below.\
+[prompt.txt](assets//files//raspberry.txt)
 
 **flag{there_are_a_few_extra_berries_in_this_one}**
 
-**Solution:** Low value n RSA attack, 10 primes for n, alpertron to find primes:
+**Solution:**: With the chellenge we are again get a text file, the content of the text file is:
+```
+n = 7735208939848985079680614633581782274371148157293352904905313315409418467322726702848189532721490121708517697848255948254656192793679424796954743649810878292688507385952920229483776389922650388739975072587660866986603080986980359219525111589659191172937047869008331982383695605801970189336227832715706317
+e = 65537
+c = 5300731709583714451062905238531972160518525080858095184581839366680022995297863013911612079520115435945472004626222058696229239285358638047675780769773922795279074074633888720787195549544835291528116093909456225670152733191556650639553906195856979794273349598903501654956482056938935258794217285615471681
+```
+This is again an RSA cipher, if we try plugging the value of n to a factor database we get the following output:
+
+![](assets//images//respberry.png)
+
+we get a big amount of factor, this is actually normal as RSA is not limited to only 2 factors (but it is really bad practice to use a lot of factors), phi is actually the value of euler's totient function for n, this value is the number of values smaller then n which don't have common factors to n and is equal to multiplication of all the factors reduced by one each ( the proof for that is actually very easy and logical), so for decrypting the message I used the following scipt which is the same as the previous script with a more general phi calculation:
 
 ```python 3
 from Crypto.Util.number import inverse, long_to_bytes
@@ -865,6 +905,12 @@ d = inverse(e,phi)
 plain = pow(ct,d,n)
 print(long_to_bytes(plain))
 ```
+By running this script we get the flag:
+
+![](assets//images//respberry_1.png)
+
+**Resources:**
+* Euler's totient function: https://en.wikipedia.org/wiki/Euler%27s_totient_function
 
 
 ***
@@ -874,11 +920,35 @@ print(long_to_bytes(plain))
 ## Microsooft
 We have to use Microsoft Word at the office!? Oof...
 
-Download the file below.
+Download the file below.\
+[microsooft.docx](assets//files//microsooft.docx)
 
 **flag{oof_is_right_why_gfxdata_though}**
 
-**Solution:** open docx as zip file and look at src/oof.txt
+**Solution:** With the challenge we get a docx file, but if we try opening it with Microsoft office or Libreoffice we get noting interesting:
+
+![](assets//images//microsooft.png)
+
+so we need to inspect the file more, docx files are actually a bunch of xml files contained in a zip file, so if we open the file as a zip file we can look at the content without relying on a document editor:
+
+![](assets//images//microsooft_1.png)
+
+after a brief inspection I found that there is a filed called foo.txt in the src directory in the zip file:
+
+![](assets//images//microsooft_2.png)
+
+and the file contains our flag:
+
+![](assets//images//microsooft_3.png)
+
+## Cow Pie
+Ew. Some cow left this for us. It's gross... but something doesn't seem right...
+
+Download the file below.
+
+**flag{this_flag_says_mooo_what_say_you}**
+
+**Solution:** run strings on manure and grep for the flag
 
 ***
 
@@ -887,20 +957,27 @@ Download the file below.
 ## Candroid
 I think I can, I think I can!
 
-Download the file below.
+Download the file below.\
+[candroid.apk](assets//files//candroid.apk)
 
 **flag{4ndr0id_1s_3asy}**
 
-**Solution:** using grep on all the files in the apk for flag format
+**Solution:** With the challenge we get an apk file, as the previous challenge an apk file is actually a zip file, we can unzip the file and grep for the flag format to get the flag:
+
+![](assets//images//candroid.png)
 
 ## Simple App
 Here's a simple Android app. Can you get the flag?
 
-Download the file below
+
+Download the file below.\
+[candroid.apk](assets//files//simple-app.apk)
 
 **flag{3asY_4ndr0id_r3vers1ng}**
 
-**Solution:** using grep on all the files in the apk for flag format
+**Solution:** same as previous challenge:
+
+![](assets/simple_app.png)
 
 ## Ends Meet
 Are you a true mobile hacker?
@@ -910,6 +987,7 @@ Download the file below.
 **flag{rev3rsIng_ApKs_l1k3_A_Pr0}**
 
 **Solution:** open the apk file in jadx-gui and get a base64 encoded url in the `MainActivity` and visit the page with useragent `volley/0`
+
 
 ***
 # Miscellaneous
@@ -922,7 +1000,13 @@ Connect here:\
 
 **flag{more_text_in_the_vortex}**
 
-**Solution:** redirecting output to file for a minute, grepping flag format.
+**Solution:** With the challenge we are given a server to connect to, if we try connecting we get...
+
+![](assets//images//vortex.png)
+
+...that...we can redirect the output of the server to a file and view the file, by doing so for a minute more or less and grepping for the flag format we get the flag:
+
+![](assets//images//vortex_1.png)
 
 ## Fake file
 Wait... where is the flag?
@@ -932,7 +1016,13 @@ Connect here:\
 
 **flag{we_should_have_been_worried_about_u2k_not_y2k}**
 
-**Solution:** there are two files in the home directory with the name ".." using grep -r you can get all the content of the files in the directory.
+**Solution:** We are given a server to connect to with the challenge, when we connect to the server we seemingly have a shell:
+
+![](assets//images//fake_file.png)
+
+seems that there are two files with the name '..' but using regular command like cat on the file won't work I eventually tried to use `grep -r .` to recursively grep the file in the directory, and we get the flag:
+
+![](assets//images//fake_file_2.png)
 
 ## Alkatraz
 We are so restricted here in Alkatraz. Can you help us break out?
@@ -943,7 +1033,14 @@ Connect here:\
 
 **flag{congrats_you_just_escaped_alkatraz}**
 
-**Solution:** printf is not restricted `printf '%s' "$(<flag.txt)"` to get flag
+**Solution:** We are given again a server to connect to, it seems that we have a shell again and that the flag is in our working directory, but we can't use cat or grep to read it:
+
+![](assets//images//alkatraz.png)
+
+I eventually got to output the file content to stdout using printf as it is not restricted and using the following command `printf '%s' "$(<flag.txt)"` and we get the flag:
+
+![](assets//images//alkatraz_2.png)
+
 
 ## Trapped
 Help! I'm trapped!
