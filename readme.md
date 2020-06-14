@@ -803,27 +803,27 @@ and the ciphertext:
 Ö¢oåÇ\"àT^N@]XõêiùÔ1÷UWETR^DˆžbÿÑ\*á^VAAVCç¤nÿÌIô]RTLE[ZDÝ£yÉÃ/ÍXl]RTWN7
 ```
 
-We can see from the script that it uses DES, DES (Data Encryption Standard) is a type of symetric cipher that was used in the 80s and the 90s as a standard cipher, in was invented with IBM with the help of the NSA (yeah that NSA) and by the 90s we found a way to crack the DES key in a metter of hours (22 hours and 15 minutes), furthermore, this cipher has a lot of weakness, one of those are the existance of weak keys, decryption and encrpytion with this keys have the same effect and so encrypting some data twice is equivalent to decryting the encryption.
+We can see from the script that it uses DES, DES (Data Encryption Standard) is a type of symmetric cipher that was used in the 80s and the 90s as the standard cipher replaced by AES in the following years, it was invented by IBM with the help of the NSA (yeah that NSA) and in the 90s   people have discovered ways to crack the cipher in a metter of hours (22 hours and 15 minutes to be precise), furthermore, this cipher has a lot of weaknesses, one of those are the existence of weak keys, decryption and encrpytion with this keys have the same effect and so encrypting some data twice is equivalent to decryting the encryption and the ciphertext is equal to the original plaintext.
 
-we can also notice that the cipher uses OFB mode of operation in this mode of operation the plaintext is splitted to blocks of 8 bytes and for each block Mi we encrypt the encryption of the previous block (in the case of the first block we encrypt IV) and xor the new encryption with the plaintext, in a visual representation:
+we can also notice that the cipher uses OFB mode of operation, in this mode the plaintext is splitted to blocks of 8 bytes and for each block of plaintext the mode encrypts the encryption of the previous block (in the case of the first block this mode encrypts IV) and xors the new encryption with the plaintext, in a visual representation:
 
 <p align="center">
   <img src="assets//images//december_1.png" style="background-color:white;" />
 </p>
 
-and in a format representation:
+and in a formal representation:
 
 <p align="center">
   <img src="assets//images//december_2.png" style="background-color:white;" />
 </p>
 
-now we can notice the following attribute of using weak keys in this mode of operation:
+we can now notice the following attribute of using weak keys in this mode of operation:
 
 <p align="center">
   <img src="assets//images//december_3.png" style="background-color:white;" />
 </p>
 
-in other word, for every block in an even position we get that the encryption with the weak keys are equal to xorring IV with the plaintext, so the plaintext for block in an even position is equal to the ciphertext xorred with IV, let's try doing that on our cipherext, we can do that using the following code:
+in other words, for every block in an even position we get that the encryption with a weak key is equal to xorring IV with the plaintext, so the plaintext for block in an even position is equal to the ciphertext xorred with IV, let's try that on our cipherext, we can do that using the following code:
 
 ```python 3
 from Crypto.Util.strxor import strxor
@@ -837,11 +837,11 @@ and we get:
 
 ![](assets//images//december_4.png)
 
-it worked!, now we know that our key is a weak key, we can find a list of weak keys to DES on wikipedia and bruteforce them until we get a complete text (there are less then 100 weak keys), so for that I listed all the weak keys:
+it worked!, now we know that our key is a weak key, we can find a list of weak keys to DES on wikipedia and bruteforce them until we get a complete text (there are less then 100 weak keys), I listed all the weak keys in the following file:
 
 [weak DES keys](assets//files//keys)
 
-and wrote the following script to crack the ciphertext:
+and wrote this script to crack the ciphertext:
 
 ```python 3
 #!/usr/bin/env python
@@ -863,6 +863,7 @@ for key in keys:
 		print(pt)
 		print(key)
 ```
+
 and we get the flag:
 
 ![](assets//images//december_5.png)
@@ -876,7 +877,7 @@ Download the file below.\
 
 **flag{there_are_a_few_extra_berries_in_this_one}**
 
-**Solution:**: With the chellenge we are again get a text file, the content of the text file is:
+**Solution:**: With the chellenge we are get a text file, the content of the text file is:
 ```
 n = 7735208939848985079680614633581782274371148157293352904905313315409418467322726702848189532721490121708517697848255948254656192793679424796954743649810878292688507385952920229483776389922650388739975072587660866986603080986980359219525111589659191172937047869008331982383695605801970189336227832715706317
 e = 65537
@@ -1020,7 +1021,7 @@ Connect here:\
 
 ![](assets//images//fake_file.png)
 
-seems that there are two files with the name '..' but using regular command like cat on the file won't work I eventually tried to use `grep -r .` to recursively grep the file in the directory, and we get the flag:
+seems that there are two files with the name '..' but using regular command like cat on the file won't work I eventually tried to use `grep -r .` to recursively grep the file in the directory, and we get the flag (or we could just get all the flags https://tildeho.me/leaking-all-flags-in-a-ctf/):
 
 ![](assets//images//fake_file_2.png)
 
