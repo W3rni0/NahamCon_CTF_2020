@@ -36,6 +36,7 @@ This is my writeup for the challenges in NahamCon CTF, I mainly focused on crypt
   - [Homecooked](#homecooked)
   - [Twinning](#twinning)
   - [Ooo-la-la](#ooo-la-la)
+  - [Unvreakable Vase](#unvreakable-vase)
   - [December](#december)
   - [Respberry](#respberry)
 * [Forensics](#forensics)
@@ -86,7 +87,7 @@ Download the file below.
 
 ![](assets//images//clisay_1.png)
 
-well that didn't give us much, we can check if there are printable strings in the file by using the strings command on the file, doing that gives us the flag:
+well that didn't give us much, we can check if there are printable strings in the file by using the strings command on it, doing that gives us the flag:
 
 ![](assets//images//clisay_2.png)
 
@@ -109,7 +110,7 @@ Download the file below.
 
 ![hackermeme.jpg](assets//images//hackermeme.jpg)
 
-We can guess by the name of the challenge and its description that there is something in the metadata of the image, so we can use exiftool on the image, exiftool allows you to see the metadata of the image, and by using it we get the flag:
+We can guess by the name of the challenge and its description that there is something in the metadata of the image, so we can use exiftool on it, exiftool allows you to see the metadata of an image, and by using it we get the flag:
 
 ![](assets//images//metameme.png)
 
@@ -129,7 +130,7 @@ http://jh2i.com:50032
 
 ![](assets//images//mr_robot.png)
 
-There doesn't seem to be a lot of stuff in the index page, but we can guess by the name of the challenge that there is something in the robots.txt file in the web server, robots.txt is a file which helps search engines (crawlers in general) to index the site correcrly, in most sites nowdays there is a robots.txt file, if we look at the file ( the link is http://jh2i.com:50032/robots.txt ) we get the flag:
+There doesn't seem to be much in the index page, but we can guess by the name of the challenge that there is something in the robots.txt file for the website, robots.txt is a file which helps search engines (crawlers in general) to index the site correcrly, in most sites nowadays there is a robots.txt file, if we look at the file ( the link is http://jh2i.com:50032/robots.txt ) we get the flag:
 
 ![](assets//images//mr_robot_2.png)
 
@@ -144,11 +145,11 @@ http://jh2i.com:50018
 
 **flag{H4cK_aLL_7H3_C0okI3s}**
 
-**Solution:** With the challenge we get a web-server to connect to:
+**Solution:** With the challenge we get a url to a website and it seems that we can login to the it using the index page:
 
 ![](assets//images//uggc.png)
 
-It seems that we can login to the site using the index page, by the description we know that we need to connect as admin, but if we try using admin as our username we get the following:
+By the description we know that we need to login as admin, but if we try using admin as our username we get the following:
 
 ![](assets//images//uggc_2.png)
 
@@ -156,20 +157,20 @@ But we can login with any other username:
 
 ![](assets//images//uggc_3.png)
 
-If we try to refresh the page or open it in any other tab it seems that the login is saved, which means that the site is using cookies, because http connection is stateless (doesn't save the connection server-side) and because sometimes the server needs to know the user on the other side it saves cookies on the computer of the user, cookies are data which is most of the time encrypted and sent with http requests to helps the server recognize the user, we can see the cookies of the site by using the inspector tool in the browser:
+If we try to refresh the page or open it in another tab it seems that the login is saved, which means that the site is using cookies, because HTTP connection is stateless (doesn't save the state of the connection server-side) and because sometimes the server needs to know who is the user in a session it saves cookies on the computer of the user, cookies are data which is most of the time encrypted and sent with HTTP requests to helps the server recognize the user, we can see the cookies of the site by using the inspector tool in the browser:
 
 ![](assets//images//uggc_4.png)
 
-we can see that the cookie stored bares a strange similarity to the username I used, that is because the cookie is encrypted using ceaser cipher, a type of substitution cipher where each letter is replaced by the letter with a specific offset from it, in our case with the offset of 13, a ceaser cipher with offset of 13 is called a rot13 cipher, now that we know the cipher of the cookie we can change our cookie to being that of the admin, we can use cyberchef to do that:
+we can see that the cookie for the site bares a strange similarity to the username I used, that is because the cookie is encrypted using ceaser cipher, a type of substitution cipher where each letter is replaced by the letter with a specific offset from it, in our case with the offset of 13, so a becomes n, b becomes o and so on, a ceaser cipher with offset of 13 is also called a ROT13 cipher, now that we know the cipher used on the cookie we can change our cookie to being that of the admin, we can use cyberchef to do that:
 
 ![](assets//images//uggc_5.png)
 
-now we only need to change the value of the cookie to the ciphertext corresponding to admin ( we can use the browser inspector tool for that ) and we get the flag:
+now we only need to change the value of the cookie to the ciphertext corresponding to admin (we can use the browser inspector tool for that) and we get the flag:
 
 ![](assets//images//uggc_6.png)
 
 **Resources:**
-* HTTP coolie: https://en.wikipedia.org/wiki/HTTP_cookie
+* HTTP cookie: https://en.wikipedia.org/wiki/HTTP_cookie
 * Ceaser cipher: https://en.wikipedia.org/wiki/Caesar_cipher
 * Cyberchef: https://gchq.github.io/CyberChef/
 
@@ -183,18 +184,20 @@ Download the file below.
 
 **flag{jtr_found_the_keys_to_kingdom}**
 
-**Solution:** With the challenge we get a file with an unknown format, we can use the file command to see that the file is a keepass database:
+**Solution:** With the challenge we get a file with an unknown format, we can use the file command to see that the file is a KeePass database:
 
 ![](assets//images//easy_keesy.png)
 
-this type of files are databases used to keep passwords on the computer, there are many password manager to view this kind of files but I used KeeWeb for this challenge mostly because it is a web tool, if we try to open the file we can quickly notice that we don't have the password for it, furthermore there aren't any mentions of the password in the file or in the description of the challenge, so it seems we need to bruteforce the password.\
-To crack the password I used a dictionary called rockyou.txt which lists common password and used John the Ripper, a tool for cracking passwords (hashes) quickly, I first converted the file to something john can use and then used rockyou.txt to crack the password by doing following commands:
+This type of files are databases used to keep passwords on the computer 'safely', there are many password manager to view this kind of files but I used KeeWeb for this challenge mostly because it is a web tool, if we try to open the file with it we can quickly notice that we don't have the password for doing that, furthermore there aren't any mentions of a password in the file or in the description of the challenge, so it seems we need to bruteforce for the password.\
+Passwords are commonly saved as hashes, hashes are data created using cryptographic hash functions which are one way functions (easy to find an hash for a password, hard to find a password for the hash) who are also able to return a value with a fixed length to any file with any size, a simple example for an hash function is the algorithm shown in december with the slight modefication that only the last block of the cipher is returned, hashes are great because it is easy to validate a value using them as you can just as hash the value using the hash function and compare the hashes, but, it is hard to get the value from an hash.\
+In the case of a KeePass database file, the password for the database, which is called a master password, is saved as an hash in the file in order for a password manager to verify it, this is not a smart idea to save the password locally like that but it's good for us.\
+To find the password I used a dictionary attack, this type of attack uses a known database in order to find the right data, in the case of password cracking we use a database of passwords, preferably ordered by most frequently used to least frequently used, we will hash each password and compare it to the hash we have until we'll find a password with the same one, this does not guarantee that we found the correct password but most probably it will find the correct one (this is caused by the birthday paradox, I linked a site which explains it in the resources), the dictionary I used is called rockyou.txt which lists common passwords. for executing the attack I used John the Ripper, a great tool for cracking hashes using a dictionary, I first converted the file to something john can use and then used john with rockyou.txt to crack the password by executing the following commands:
 
 ```bash
 keepass2john easy_keesy > kp
 john --wordlist=/usr/share/wordlists/rockyou.txt -format:keepass kp
 ```
-and by doing so we get that the password for the file is monkeys, if we try using it in KeeWeb we are given access to the database and we get our flag:
+by doing that we get that the password for the file is monkeys, if we try using it in KeeWeb we are given access to the database and we get the flag:
 
 ![](assets//images//easy_keesy_1.png)
 
@@ -204,6 +207,8 @@ and by doing so we get that the password for the file is monkeys, if we try usin
 * KeeWeb: https://keeweb.info/
 * rockyou.txt: https://wiki.skullsecurity.org/Passwords
 * John the Ripper: https://tools.kali.org/password-attacks/john
+* cryptographic hash function (CHF): https://en.wikipedia.org/wiki/Cryptographic_hash_function
+* The birthday paradox: https://en.wikipedia.org/wiki/Birthday_problem
 
 ## Peter Rabbit
 Little Peter Rabbit had a fly upon his nose, and he flipped it and he flapped it and it flew away!
@@ -219,7 +224,7 @@ Download the file below.\
 
 ![](assets//images//peter.png)
 
-this is actually an esoteric programming language called piet, named after the artist Piet Mondrian, we can use an interpreter to execute the script, I used the one linked below, by using it we get the flag:
+this is actually an esoteric programming language called piet, named after the artist Piet Mondrian, we can use an interpreter to execute the script (I linked the one I used in the resources), by doing so we get the flag:
 
 ![](assets//images//peter_2.png)
 
@@ -240,7 +245,7 @@ Download the file below.
 
 **flag{wham_bam_thank_you_for_the_flag_maam}**
 
-**Solution:** With the challenge we get a unknown file, we can use the file command to see that this is a PNG image, but it seems we can't open the image in an image viewer, so we can guess that the image is corrupted, we can verify that by using the tool pngcheck:
+**Solution:** With the challenge we get a unknown file, we can use the file command to see that this is a PNG image, but it seems we can't open the image in an image viewer, so we can guess that the image is corrupted, we can verify that by using a tool called pngcheck:
 
 ![](assets//images//pang_1.png)
 
@@ -250,7 +255,7 @@ We can fix the image by changing value of the CRC, I prefer to do it using an he
 ![](assets//images//pang_2.png)
 ![](assets//images//pang_3.png)
 
-and by saving the modified image and viewing it again we get the flag:
+and by saving the modified file and viewing it again we get the flag:
 
 ![](assets//images//pang.png)
 
@@ -275,9 +280,12 @@ https://apporima.com/
 
 ![](assets//images//time_keeper.png)
 
-we can use a site called wayback machine (linked in resources) to view older versions, it seems that there is only one older version on site from the 18th of april, and there is a snapshot of the index page:
+we can use a site called wayback machine (linked in resources) to view older versions of sites, it seems that there is only one older version on site from the 18th of april, and there is a snapshot of the index page:
 
 ![](assets//images//time_keeper_2.png)
+
+link to the snapshot:
+`https://web.archive.org/web/20200418214642/https://apporima.com/`
 
 You can see that the first blog post from the older version can't be found in the current version, furthermore it suggests that the flag is in the web server of the site under /flag.txt, trying to view the file in the current version gives us 404 error, but if we try to view older version of it in the the wayback machine we get the flag:
 
@@ -293,7 +301,7 @@ Connect here: jh2i.com
 
 **flag{next_year_i_wont_use_spf}**
 
-**Solution:** We can infer from the name of the challenge and the description that it has something to do with nameservers, nameserver are servers which handle resolving human-readable identifiers to numberical identifiers, in the case of web server, nameserver handle providing responses to queries on domain names, we can view this responses using the dig command, in our case we want to view all the type of responses availiable (the more the merrier), we can do this by writing ANY after the command, the full command is:
+**Solution:** We can infer from the name of the challenge and the description that it has something to do with nameservers, nameserver are servers which handle resolving human-readable identifiers to numberical identifiers, in the case of web server, nameserver handle providing responses to queries on domain names, usually converting urls to IP addresses but not always, we can view this responses using the dig command, in our case we want to view all the type of responses availiable (the more the merrier), we can do this by writing ANY after the command, the full command is:
 
 `dig jh2i.com ANY`
 
@@ -342,7 +350,7 @@ NahamConTron is up to more shenanigans. Find his server.
 
 **flag{nahamcontron_is_on_the_grid}**
 
-**Solution:** Taking a look back at the list Sherlock returned we can see that there is an account in github with this username, let's take a look at it:
+**Solution:** Taking a look back at the list Sherlock returned in the previous challenge we can see that there is an account in github with this username, let's take a look at it:
 
 ![](assets//images//tron_1.png)
 
@@ -358,11 +366,11 @@ but the first one has some interesting files:
 
 ![](assets//images//tron_4.png)
 
-the first file to pop into view is the .bash_history file, it contains the command history of a user and can reveal sensitive information about user activity, in our case it contains the following line:
+the first file to pop into view is the .bash_history file, it contains the command history of a user and can reveal sensitive information about the user activity, in our case it contains the following line:
 ```bash
 ssh -i config/id_rsa nahamcontron@jh2i.com -p 50033
 ```
-so we now know the user has connected to a server using an SSH private key, and we also know that the key is in a config folder .... intesting, maybe it is the same folder as the one in the repo?
+so we now know the user has connected to a server using the SSH protocol (Secure Shell protocol) with an SSH private key, and we also know that the key is in a config folder .... intesting, maybe it is the same folder as the one in the repo?
 
 ![](assets//images//tron_5.png)
 
@@ -432,7 +440,7 @@ Download the file below.
   <img src="assets//images//luke.jpg">
 </p>
 
-We can infer by the challenge name and the challenge description that we need to use Jsteg (link in the resources), this is a type of tool for hiding data in the least segnificant bit (LSB) of the bytes in the image, this image is actually an image of the creator of the tool (whose name is luke), I only succeeded in using the tool by running the main.go script thats in jsteg/cmd/jsteg using the following command:
+We can infer by the challenge name and the challenge description that we need to use Jsteg (link in the resources), this is a type of tool for hiding data in the least segnificant bit (LSB) of the bytes in the image, this image is actually an image of the creator of the tool (whose name is luke), I only succeeded in using the tool by running the main.go script that's in jsteg/cmd/jsteg using the following command:
 
 ![](assets//images//luke_1.png)
 
@@ -456,7 +464,7 @@ Download the file below.
   <img src="assets//images//doh.jpg">
 </p>
 
-because this is a stego challenge one of the first thing I do is to check if there is files embedded in the image using binwalk and steghide, luckily steghide comes to use and finds a text file in the image which actually contains the flag:
+because this is a stego challenge one of the first thing I do is to check if there are files embedded in the image using binwalk and steghide, luckily steghide comes to use and finds a text file in the image which actually contains the flag:
 
 ![](assets//images//doh_1.png)
 
@@ -474,17 +482,17 @@ Download the file below.
 
 **flag{do_you_speak_the_beep_boop}**
 
-**Solution:** Now we are given for a change a WAV file (Wave audio file),In it we can hear key presses of a phone, this is actually DTMF (daul tone multi frequency) which were used to signal to the phone company that a specific key was pressed, we can actually decipher this tones using a tool called multimon-ng or using the web tool listed below, this will give us the folloiwing code:
+**Solution:** Now we are given for a change a WAV file (Wave audio file), in it we can hear key presses of a phone, this is actually DTMF (daul tone multi frequency) which were used to signal to the phone company that a specific key was pressed and they have quite a lot of history with respect to hacking, we can actually decipher this tones using a tool called multimon-ng or using the web tool listed below, this will give us the folloiwing code:
 
 ```
 46327402297754110981468069185383422945309689772058551073955248013949155635325
 
 ```
-you can use the command the following command to extract the number:
+we can execute the following command to extract the number:
 
 `multimon-ng -t wav -a DTMF flag.wav | grep -o "[0-9]+" | tr -d "\n"`
 
-I tried a lot of ways to get the flag from this number and eventually figured out that you need to convert the numbers from decimal to hex and then from hex to ascii, or alternativly use long_to_bytes from the pycryptodome module, by doing so we get the flag:
+I tried a lot of ways to get the flag from this number and eventually figured out that you need to convert the numbers from decimal format to hex and then from hex to ascii, or alternatively use long_to_bytes from the pycryptodome module, by doing so we get the flag:
 
 ![](assets//images//beep_boop.png)
 
@@ -492,13 +500,15 @@ I tried a lot of ways to get the flag from this number and eventually figured ou
 * DTMF: https://en.wikipedia.org/wiki/Dual-tone_multi-frequency_signaling
 * multimon-ng: https://tools.kali.org/wireless-attacks/multimon-ng
 * Web DTMF decoder: http://dialabc.com/sound/detect/index.html
+* long_to_bytes: https://pycryptodome.readthedocs.io/en/latest/src/util/util.html#Crypto.Util.number.long_to_bytes
 
 ## Snowflake
 Frosty the Snowman is just made up of a lot of snowflakes. Which is the right one?
 
 Note, this flag is not in the usual format.
 
-Download the file below.
+Download the file below.\
+[frostythesnowman.txt](assets//files//frostythesnowman.txt)
 
 **JCTF{gemmy_spinning_snowflake}**
 
@@ -518,7 +528,7 @@ Oh, Frosty the snowman
 
 ```
 
-but if we open the file in Notepad++ and turn on the option the show special symbol we can now see that something is off with the file:
+but if we open the file in Notepad++ and turn on the option the show special symbols we can now see that something is off with the file:
 
 ![](assets//images//snowman_1.png)
 
@@ -526,7 +536,7 @@ these are tabs and spaces, and this type of steganography is actually SNOW (Steg
 
 ![](assets//images//snowman_2.png)
 
-After a bit of trial and error I discovered that it is password protected, so I wrote a simple bash script which reads the passwords from rockyou.txt line by line and try to decrypt the data:
+After a bit of trial and error I discovered that it is password protected, so I wrote a simple bash script which reads the passwords from rockyou.txt line by line and try to decrypt the data, this is a dictionary attack, and a simple one at that (I explained more about this type of attacks in the writeup for Easy Keesy):
 
 ```bash
 file=rockyou.txt
@@ -573,11 +583,11 @@ There is a flag in my swap!
 Download the file below.\
 [deadswap](assets//files//deadswap)
 
-**PostCTF**
+**PostCTF writeup**
 
 **flag{what_are_you_doing_in_my_swap}**
 
-**Solution:** With the challenge we are given a file from an unknown type, by using xxd on the file we it seems that we only have \xff bytes:
+**Solution:** With the challenge we are given a file from an unknown type, with can infer from the challenge title and description that this is a swap file, without getting into details, swap files are files saved in the hard drives to be used as an extension to the memory, when a computer needs to save some data on the memory for quick access and doesnt have a place for it the computer moves a chunk of the data stored on the memory to the hard drive (usually the least used chunk) and overwrites this chunk in the memory with the data, this is actually really not important for this challenge, by using xxd on the file it seems that we only have \xff bytes:
 
 ![](assets//images//deadswap_1.png)
 
@@ -593,17 +603,20 @@ the one-liner prints the hexdump of the file, greps for lines which contains int
 
 ![](assets//images//deadswap_3.png)
 
+**Resources:**
+* Swap file: https://www.computerhope.com/jargon/s/swapfile.htm
+
 ## Walkman
 Do you hear the flag? Maybe if you walk through it one step at a time.
 
 Download the file below.\
 [wazaa.wav](assets//files//wazaa.wav)
 
-**PostCTF**
+**PostCTF writeup**
 
 **flag{do_that_bit_again}**
 
-**Solution:** We are given a WAV file with the challenge, I personaly hate steganography that is related to audio, if it is not spectogram and wavsteg can't find it I just quit...but i'm a comlpetionist, so i'll cover that as well, we need to use wav-steg-py tool listed in the resources with the next command:
+**Solution:** We are given a WAV audio file with the challenge, I personally hate steganography that is related to audio, if it is not spectogram and wavsteg can't find something I just quit...but i'm a completionist, so I'll cover that as well, we need to use a tool called wav-steg-py which is listed in the resources using this command to extract the flag:
 
 `python3 wav-steg.py -r -s wazaaa.wav -o a -n 1 -b 1000`
 
@@ -611,7 +624,7 @@ in action:
 
 ![](assets//images//walkman.png)
 
-this tool uses the least significant bit to hide data (which wavsteg also do so i'm not sure why this worked), it is quite common to hide data in the LSB of the file so this type of this are really handy.
+this tool uses the least significant bit to hide data and extract hidden data (which wavsteg also do so i'm not sure why it didn't work with it), it's quite common to hide data in the LSB of the file so this type of tools are really handy.
 
 **Resources:**
 * wav-steg-py: https://github.com/pavanchhatpar/wav-steg-py
@@ -622,13 +635,17 @@ Did Dade Murphy do this?
 Note, this flag is not in the usual format
 
 Download the file below.\
-[hackers.bmp](assets//files//hackers.bmp)
+[hackers.bmp](assets//images//hackers.bmp)
 
 **PostCTF**
 
 **JCTF{at_least_the_movie_is_older_than_this_software}**
 
-**Solution:** With the challenge we are given a bitmap (bmp) file, this a quite old file format and rarely used today as the compression algorithm is really not good and rarely supported so it is not very efficient in space to use a bmp file format for  images, especially if you consider the image quality nowdays, this flag is again hidden in the least significant bits of the image and again I tried using stegolsb during the CTF and got nothing, a smarter approche is to use zsteg, this tool checks all the availiable channels and even in the most significant bit for hidden data (I actually forgot I have this tool), we can get the flag using the following command:
+**Solution:** With the challenge we are given a bitmap (bmp) file:
+
+![](assets//images//hackers.bmp)
+
+bmp format is a quite old file format and rarely used today as its compression algorithm is really not good and rarely supported so it's not very efficient in space to save images as bmp files, especially if you consider the image quality nowadays, the flag is again hidden in the least significant bits of the image and again I tried checking that during the CTF and got nothing, a smarter approach is to use zsteg, which checks all the availiable channels and even checks the most significant bit for hidden data, we can get the flag using the following command:
 
 `zsteg -a hackers.bmp`
 
@@ -648,7 +665,7 @@ Download the file below.\
 
 **flag{xor_is_not_for_security}**
 
-**Solution:** We get an unknown file with the challenge, obviously from the challenge description and challenge name we know that the file is xored and that the key is of length 4, if we look at the hex dump of the file we can notice a reaccuring pattern of bytes `\x5a\x41\x99\xbb` :
+**Solution:** We get an unknown file with the challenge, obviously from the challenge description and challenge name we know that the file is xored and that the key is of length 4, if we look at the hex dump of the file we can notice this reaccuring pattern of bytes `\x5a\x41\x99\xbb` :
 
 ![](assets//images/docxor_1.png)
 
@@ -669,6 +686,11 @@ so we can infer that key is `\x5a\x41\x99\xbb`, plugging the file into cyberchef
 this is actually not a zip file but a docx file by the folders in it (there are a lot of file types which are actually zip) if we open the file using Microsoft word or Libreoffice we get the flag:
 
 ![](assets//images/docxor_3.png)
+
+**Resources:**
+* Xor: https://en.wikipedia.org/wiki/Exclusive_or
+* Frequency analysis: https://en.wikipedia.org/wiki/Frequency_analysis
+* An example to some of the file types which are actually zip: https://www.quora.com/Which-file-types-are-really-ZIP-or-other-compressed-packages
 
 
 ## Homecooked
@@ -725,12 +747,12 @@ print()
 
 this script is used for decrypting the cipher but it doesn't seem to work well:
 
-![](assets//images//homecooked.png)
+![](assets//files//homecooked.gif)
 
-it somewhat stops printing at this point but still runs, we can guess by that the code is inefficient, we can try to understand what it does to figure out how to make it more efficient, we can see that the script decode the ciphertext from base64 to bytes, then for each byte in the ciphertext it tries to find a value of next value of num such that both functions a and b returns a boolean value of True, and xors that value with the value of the byte and prints the result, but by the 13th byte the value of num is jumped to 50000 and by the 26th byte the value of num is jumped to 500000.
+it somewhat stops printing at this point but still runs, we can guess by that the code is inefficient, we can try to understand what the script does to figure out how to make it more efficient, we can see that the script decode the ciphertext from base64 to bytes, then for each byte in the ciphertext it tries to find a value of next value for num such that both functions a and b returns a boolean value of True, then xors that value with the value of the byte and prints the result, it continues likes that for the succeeding bytes while continuously increasing the value of num by one, but, by the 13th byte the value of num is jumped to 50000 and by the 26th byte the value of num is jumped to 500000.
 
-let's look at the functions, a checks if there are no numbers bigger then 2 and smaller then the input that divide the input without a remainder, so a checks if the input is prime.
-The function b checks if the input is equal to a the number in input in revese so b checks if the input is a palidrome.
+Now let's look at the functions, a checks if there are no numbers bigger then 2 and smaller then the input that can divide it without a remainder, so a checks if the input is prime.
+The function b checks if the input is equal to itself in revese so b checks if the input is a palidrome.
 a return True if the number is prime and b checks if the number is a palindrome, so the values that are xorred with the bytes of the cipher are palindromic primes
 
 if we take a second look at the function a we can see that it is very inefficent as it checks for all the numbers that are smaller then the input if they can divide it without a remainder, we can replace it with the primality test in the sympy module, which uses an efficient method (Rabin-Miller Strong Pseudoprime Test), in the end we get the less obfuscated following script:
@@ -774,7 +796,8 @@ print()
 ```
 and by running this more efficient script we get the flag in a reasonable time:
 
-![](assets//images//homecooked_2.png)
+![](assets//files//homecooked_2.gif)
+
 
 ## Twinning
 These numbers wore the same shirt! LOL, #TWINNING!
@@ -796,11 +819,11 @@ and I explained why it works and how we can break the cipher:
 
 >...for that we need to talk about factors, factors are numbers which can be divided only by 1 and themself (we are only talking about whole numbers), we have discovered that there are infinitly many factors and that we can represent any number as the multiplication of factors, but, we havent discovered an efficient way to find out which factors make up a number, and some will even argue that there isn't an efficient way to do that (P vs. NP and all that), which means that if we take a big number, it will take days, months and even years to find out the factors which makes it, but, we have discovered efficient ways to find factors, so if I find 2 factors, which are favorably big, I multiply them and post the result on my feed to the public, it will take a lot of time for people to discover the factors that make up my number. But, and a big but, if they have a database of numbers and the factors that make them up they can easily find the factors for each numbers I will post, and as I explained before, if we can the factors we can easily calculate phi and consequently calculate d, the private key of RSA, and break the cipher, right now there are databases (listed below) with have the factors to all the numbers up to 60 digits (if I remember correctly), which is a lot but not enough to break modern RSA encryptions, but if we look at the challenge's parameters, we can see that n is awefully small, small enough that it most be in some databases...
 
-if we search for the value of n in factorDB, a database for the factors of numbers as I describerd we can find factors for the value of n given to us:
+if we search for the value of n in factorDB, a database for the factors of numbers, we can find factors for the value of n given to us:
 
 ![](assets//images//twinning_2.png)
 
-now we can write a small script which calculates phi, finds d the modular inverse for modulo phi and raise the ciphertext to the power of d (or be a script kiddie and use the RSA module):
+now we can write a small script which calculates phi, finds d the modular inverse for e modulo phi and raise the ciphertext to the power of d (or be a script kiddie and use the RSA module):
 
 ```python 3
 from Crypto.Util.number import inverse
@@ -844,7 +867,7 @@ So this is another RSA challenge, we can again try to find the factors that make
 
 ![](assets//images//ooolala_1.png)
 
-and we have the factors, now let's recycle the script from the last challenge now with the new parameters,also now we need to convert the plaintext to ascii encoded characters we can use the function long_to_bytes from pycryptodome for that:
+and we have the factors, now let's recycle the script from the last challenge now with the new parameters,also now we need to convert the plaintext to ascii encoded characters, we can use the function long_to_bytes from pycryptodome for that:
 
 ```python 3
 from Crypto.Util.number import inverse, long_to_bytes
@@ -864,6 +887,60 @@ print(long_to_bytes(plain))
 and by running the script we get the flag:
 
 ![](assets//images//ooolala_2.png)
+
+## Unvreakable Vase
+Ah shoot, I dropped this data and now it's all squished and flat. Can you make any sense of this?
+
+Download the file below.\
+[prompt.txt](assets//files//vase.txt)
+
+**PostCTF Writeup**
+
+**flag{does_this_even_count_as_cryptooo}**
+
+**Solution:** We this challenge we are given a text file with the following content:
+
+```
+zmxhz3tkb2vzx3roaxnfzxzlbl9jb3vudf9hc19jcnlwdg9vb30=
+```
+
+this seems to be base64 encoding, but if you try to decode it from base64 to ascii you dont get much:
+```
+ÎlaÏ{dokóÇzèk.ßÏ.ån_co{îuÿas_crypv.oo}
+```
+
+I didn't actually managed to solve this challenge by myself during the CTF thinking it is a combination between rail cipher and base64 but actually that is just a base64 encoding where all the upper cased letters were lowered, we can try going over all combination of lower case and upper case for all the characters in the string but it will take two to the power of the length of the string, which is 2 to the power of 52 at most and at least 2 to the power of 40 if we exclude numbers and symbol, which is still a lot.\
+But, we can do something else, base64 is using characters to represents the numbers from 0 to 63, if w'ill encode one letter from base64 to binary we get a binary string of length 6 bits, but each ascii character take 8 bits to encode, so if we want to find the smallest ascii substring that decodes to a base64 string without padding we'll need to find a lowest common multiple (LCM) value, for those numbers the LCM is 24, and s0 every 24/8 = 3 ascii characters are encoded to 24/6 = 4 base64 characters without padding and if we will split our ciphertext to blocks of 4 characters and try every possible combination of upper case and lower case on every character in each block until we get a readable substring (preferably of the flag which very likely though not guaranteed) w'ill need to try at most 2 to the power of 4 multipled by the number of blocks for every block, in out case `(2 ** 4) * (52 / 4) = (2 ** 4) * 12` which is a lot less then what we had before, for that I wrote the following script which goes through every block in the ciphertext and tries all the possible combinations until the ascii strings decoded from the block are printable (in the range from space \x20 to tilda \x7e):
+
+```python 3
+import base64
+from string import printable
+
+cipher = list('zmxhz3tkb2vzx3roaxnfzxzlbl9jb3vudf9hc19jcnlwdg9vb30=')
+
+for i in range(0,len(cipher),4):
+	for j in range(2 ** 4):
+		curr_byte = cipher[i:i+4].copy()
+		string_index = int(i/4*3)
+		for k in range(len(curr_byte)):
+			if j % (2 ** (k + 1)) >= 2 ** k:
+				curr_byte[k] = curr_byte[k].upper()
+		new_cipher = cipher[:i] + curr_byte + cipher[i+4:]
+		max_char = chr(max(base64.b64decode(''.join(new_cipher))[string_index: string_index+3]))
+		min_char = chr(min(base64.b64decode(''.join(new_cipher))[string_index: string_index+3]))
+		if min_char in printable and max_char in printable:
+			cipher[i:i+4] = curr_byte
+			break
+	print(base64.b64decode(''.join(cipher)))
+```
+
+and by running this script we get the flag:
+
+![](assets//images//unvreakable_vase.png)
+
+**Resources:**
+* I used this writeup just to discover the cipher although it seems that he solved just it like me with a way better script: https://deut-erium.github.io/WriteUps/nahamconCTF/crypto/Unvreakable%20Vase/
+* Least common multiple: https://en.wikipedia.org/wiki/Least_common_multiple
 
 ## December
 This is my December...
@@ -904,7 +981,8 @@ and the ciphertext:
 Ö¢oåÇ\"àT^N@]XõêiùÔ1÷UWETR^DˆžbÿÑ\*á^VAAVCç¤nÿÌIô]RTLE[ZDÝ£yÉÃ/ÍXl]RTWN7
 ```
 
-We can see from the script that it uses DES, DES (Data Encryption Standard) is a type of symmetric cipher that was used in the 80s and the 90s as the standard cipher replaced by AES in the following years, it was invented by IBM with the help of the NSA (yeah that NSA) and in the 90s   people have discovered ways to crack the cipher in a metter of hours (22 hours and 15 minutes to be precise), furthermore, this cipher has a lot of weaknesses, one of those are the existence of weak keys, decryption and encrpytion with this keys have the same effect and so encrypting some data twice is equivalent to decryting the encryption and the ciphertext is equal to the original plaintext.
+We can see from the script that it uses DES, DES (Data Encryption Standard) is a type of symmetric cipher that was used in the 80s and the 90s as the standard cipher replaced by AES in the following years, it was invented by IBM with the help of the NSA (yeah that NSA) and in the 90s   people have discovered ways to crack the cipher in a metter of hours (22 hours and 15 minutes to be precise).\
+This cipher also has a lot of weaknesses, one of those are the existence of weak keys, decryption and encrpytion with this keys have the same effect and so encrypting some data twice with the same weak key is equivalent to decryting the encryption and the ciphertext is equal to the original plaintext.
 
 we can also notice that the cipher uses OFB mode of operation, in this mode the plaintext is splitted to blocks of 8 bytes and for each block of plaintext the mode encrypts the encryption of the previous block (in the case of the first block this mode encrypts IV) and xors the new encryption with the plaintext, in a visual representation:
 
@@ -938,7 +1016,7 @@ and we get:
 
 ![](assets//images//december_4.png)
 
-it worked!, now we know that our key is a weak key, we can find a list of weak keys to DES on wikipedia and bruteforce them until we get a complete text (there are less then 100 weak keys), I listed all the weak keys in the following file:
+it worked!, now we know that our key is a weak key, we can find a list of weak keys to DES on google and bruteforce them until we get a complete text (there are less then 100 weak and semi-weak keys), I listed all the weak keys in the following file:
 
 [weak DES keys](assets//files//keys)
 
@@ -988,7 +1066,7 @@ This is again an RSA cipher, if we try plugging the value of n to a factor datab
 
 ![](assets//images//respberry.png)
 
-we get a big amount of factor, this is actually normal as RSA is not limited to only 2 factors (but it is really bad practice to use a lot of factors), phi is actually the value of euler's totient function for n, this value is the number of values smaller then n which don't have common factors to n and is equal to multiplication of all the factors reduced by one each ( the proof for that is actually very easy and logical), so for decrypting the message I used the following scipt which is the same as the previous script with a more general phi calculation:
+this is a big amount of factors, this amount is actually okay as RSA is not limited to only 2 factors (but it is really bad practice to use a lot of factors), phi is actually the value of euler's totient function for n, this value is the number of values smaller then n which don't have common factors with n, and this value is actually equal to multiplication of all the factors reduced by one each (the proof for that is actually very easy and logical), so for decrypting the message I used the following scipt which is the same as the previous script with a more general phi calculation:
 
 ```python 3
 from Crypto.Util.number import inverse, long_to_bytes
@@ -1027,7 +1105,7 @@ Download the file below.\
 
 **flag{oof_is_right_why_gfxdata_though}**
 
-**Solution:** With the challenge we get a docx file, but if we try opening it with Microsoft office or Libreoffice we get noting interesting:
+**Solution:** With the challenge we get a docx file, but if we try opening it with Microsoft Word or Libreoffice we get noting interesting:
 
 ![](assets//images//microsooft.png)
 
@@ -1046,7 +1124,8 @@ and the file contains our flag:
 ## Cow Pie
 Ew. Some cow left this for us. It's gross... but something doesn't seem right...
 
-Download the file below.
+Download the file below.\
+[manure](assets//files//manure)
 
 **flag{this_flag_says_mooo_what_say_you}**
 
