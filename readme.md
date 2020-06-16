@@ -1372,6 +1372,7 @@ mapping =   {"AAA":'y',
              "TTG":'d',
              "TTT":'g'}
 
+
 # The type of questions dina asks and the position of the string in them
 question_types = {'send the string': 4,
                   'send the message': 5,
@@ -1407,9 +1408,12 @@ for _ in range(200):
 
             # Recieves until a message is sent
             ciphertext = ''
-            while ciphertext == '':
-                  ciphertext = beautify_data(s.recv())
-
+            try:
+                  while ciphertext == '':
+                        ciphertext = beautify_data(s.recv())
+            except EOFError:
+                  s.close()
+                  break
             # Checks if the flag is given
             if 'flag' in ciphertext:
                   print(ciphertext)
@@ -1440,7 +1444,7 @@ for _ in range(200):
             print(plaintext)
             print(str(index) + ": " + str(frequency_letters))
 
-            response = ''
+            response = 'random'
             for q in question_types.keys():
                   if q in plaintext:
                         response = plaintext.split(" ")[question_types[q]]
@@ -1452,104 +1456,6 @@ for _ in range(200):
 
 print(frequency)
 ```
-and oh boy did it worked, after a little more than an hour I suceeded in finding out a mapping for every used codon and get the flag:
-
-![](assets//images//dina_2.png)
-
-actually the mapping is not spot-on for numbers but because the string only comprises of  letters this is not that crucial.
-
-## Rotten
-Ick, this salad doesn't taste too good!
-
-Connect with:\
-`nc jh2i.com 50034`
-
-**flag{now_you_know_your_caesars}**
-
-**Solution:** server response is ceaser cipher encrypted, code:
-
-```python 3
-from pwn import remote
-import re
-import re
-
-host, port = 'jh2i.com', 50034
-s = remote(host,port)
-
-flag = [''] * 32
-for _ in range(200):
-	question = s.recv()
-	answer = list(str(question)[2:-3])
-	for i in range(27):
-		for j in range(len(answer)):
-			if ord(answer[j]) >= ord('a') and ord(answer[j]) <= ord('z'):
-				answer[j] = chr((ord(answer[j]) - ord('a') + 1) % ( ord('z') - ord('a') + 1) + ord('a'))
-		plain = ''.join(answer)
-		if 'send back' in plain:
-			break
-
-	position = re.findall("[0-9]+",plain)
-	if len(position) > 0:
-		flag[int(position[0])] = plain[-2]
-		empty = [i for i in range(len(flag)) if flag[i] == '']
-		print(''.join(flag), end='\r\n')
-	s.send(plain)
-
-s.close()
-```
-
-## Really powerful Gnomes
-Only YOU can save the village!
-
-Connect with:
-`nc jh2i.com 50031`
-
-**flag{it_was_in_fact_you_that_was_really_powerful}**
-
-**Solution:** Automate going on adventure and buying weapons:
-
-```python 3
-from pwn import *
-import re
-
-prices = [1000,2000,10000,100000,10000]
-gold = 0
-
-def beautify_data(msg):
-	return str(msg)[2:-1].replace("\\n","\n")
-
-
-host, port = 'jh2i.com', 50031
-s = remote(host,port)
-
-for i in range(5):
-	response = beautify_data(s.recv())
-	if "flag" in response:
-		print(re.findall("flag{.*?}",response)[0])
-		exit(0)
-
-
-	s.send("6\n{}\n".format(i + 1))
-	while int(gold) < prices[i]:
-		response = beautify_data(s.recv())
-		if "flag" in response:
-			print(re.findall("flag{.*?}",response)[0])
-			exit(0)
-
-		gold = re.findall("[0-9]+",response)[1]
-		print("gold: " + gold)
-		s.send("{}\n".format(5 - i))
-
-
-
-s.send("1\n")
-if "flag" in response:
-	print(re.findall("flag{.*?}",response)[0])
-
-s.interactive()
-s.close()
-```
-
 
 ***
 
