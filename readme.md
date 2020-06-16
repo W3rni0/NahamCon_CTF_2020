@@ -53,6 +53,7 @@ This is my writeup for the challenges in NahamCon CTF, I mainly focused on crypt
   - [Trapped](#trapped)
   - [Awkward](#awkward)
 * [Scripting](#scripting)
+  - [Dina](#dina)
   - [Rotten](#rotten)
   - [Really powerful Gnomes](#really-powerful-gnomes)
 * [Web](#web)
@@ -751,11 +752,11 @@ this script is used for decrypting the cipher but it doesn't seem to work well:
 
 it somewhat stops printing at this point but still runs, we can guess by that the code is inefficient, we can try to understand what the script does to figure out how to make it more efficient, we can see that the script decode the ciphertext from base64 to bytes, then for each byte in the ciphertext it tries to find a value of next value for num such that both functions a and b returns a boolean value of True, then xors that value with the value of the byte and prints the result, it continues likes that for the succeeding bytes while continuously increasing the value of num by one, but, by the 13th byte the value of num is jumped to 50000 and by the 26th byte the value of num is jumped to 500000.
 
-Now let's look at the functions, a checks if there are no numbers bigger then 2 and smaller then the input that can divide it without a remainder, so a checks if the input is prime.
+Now let's look at the functions, a checks if there are no numbers bigger than 2 and smaller than the input that can divide it without a remainder, so a checks if the input is prime.
 The function b checks if the input is equal to itself in revese so b checks if the input is a palidrome.
 a return True if the number is prime and b checks if the number is a palindrome, so the values that are xorred with the bytes of the cipher are palindromic primes
 
-if we take a second look at the function a we can see that it is very inefficent as it checks for all the numbers that are smaller then the input if they can divide it without a remainder, we can replace it with the primality test in the sympy module, which uses an efficient method (Rabin-Miller Strong Pseudoprime Test), in the end we get the less obfuscated following script:
+if we take a second look at the function a we can see that it is very inefficent as it checks for all the numbers that are smaller than the input if they can divide it without a remainder, we can replace it with the primality test in the sympy module, which uses an efficient method (Rabin-Miller Strong Pseudoprime Test), in the end we get the less obfuscated following script:
 
 ```python 3
 import base64
@@ -813,7 +814,7 @@ Connect with:\
 
 we can guess that this is an RSA encryption, I explained more about how RSA works in my writeup for RACTF 2020:
 
-> ... RSA is a public key cipher, which means that there are two keys, one that is public which is used to encrypt data, and one that is private which is used to decrpyt data, obviously there is some sort of connection between the keys but it is hard to reveal the private key from the public keys (and in this case vice versa), specificly in RSA in order to find the private key we need to solve the integer factorazition problem, which is thought to be in NP/P (this is not important for the challenge), we will call our public key e and our private key d, they posses the following attribute - d multiply by e modulo the value of (p-1) * (q-1) which we will name from now phi, is equal to 1, we will call d the modular multiplicative inverse of e and e the modular multiplicative inverse of d, futhermore if we take a plaintext message pt and raise it to the power of d and then to the power of e modulo the value of p * q, which we will name n and will be commonly given to us insted of q and p, we will get pt again (to understand why it is needed to delve into modern algebra, if n is smaller to pt then obviously we will not get pt), now with that in mind we can talk about the cipher, encrpytion in this cipher is raising the plaintext pt to the power of the public key e mod the value of n, simillarly, decryption is raising the ciphertext to the power of d mod n...
+> ... RSA is a public key cipher, which means that there are two keys, one that is public which is used to encrypt data, and one that is private which is used to decrpyt data, obviously there is some sort of connection between the keys but it is hard to reveal the private key from the public keys (and in this case vice versa), specificly in RSA in order to find the private key we need to solve the integer factorazition problem, which is thought to be in NP/P (this is not important for the challenge), we will call our public key e and our private key d, they posses the following attribute - d multiply by e modulo the value of (p-1) * (q-1) which we will name from now phi, is equal to 1, we will call d the modular multiplicative inverse of e and e the modular multiplicative inverse of d, futhermore if we take a plaintext message pt and raise it to the power of d and then to the power of e modulo the value of p * q, which we will name n and will be commonly given to us insted of q and p, we will get pt again (to understand why it is needed to delve into modern algebra, if n is smaller than pt then obviously we will not get pt), now with that in mind we can talk about the cipher, encrpytion in this cipher is raising the plaintext pt to the power of the public key e mod the value of n, simillarly, decryption is raising the ciphertext to the power of d mod n...
 
 and I explained why it works and how we can break the cipher:
 
@@ -1016,7 +1017,7 @@ and we get:
 
 ![](assets//images//december_4.png)
 
-it worked!, now we know that our key is a weak key, we can find a list of weak keys to DES on google and bruteforce them until we get a complete text (there are less then 100 weak and semi-weak keys), I listed all the weak keys in the following file:
+it worked!, now we know that our key is a weak key, we can find a list of weak keys to DES on google and bruteforce them until we get a complete text (there are less than 100 weak and semi-weak keys), I listed all the weak keys in the following file:
 
 [weak DES keys](assets//files//keys)
 
@@ -1066,7 +1067,7 @@ This is again an RSA cipher, if we try plugging the value of n to a factor datab
 
 ![](assets//images//respberry.png)
 
-this is a big amount of factors, this amount is actually okay as RSA is not limited to only 2 factors (but it is really bad practice to use a lot of factors), phi is actually the value of euler's totient function for n, this value is the number of values smaller then n which don't have common factors with n, and this value is actually equal to multiplication of all the factors reduced by one each (the proof for that is actually very easy and logical), so for decrypting the message I used the following scipt which is the same as the previous script with a more general phi calculation:
+this is a big amount of factors, this amount is actually okay as RSA is not limited to only 2 factors (but it is really bad practice to use a lot of factors), phi is actually the value of euler's totient function for n, this value is the number of values smaller than n which don't have common factors with n, and this value is actually equal to multiplication of all the factors reduced by one each (the proof for that is actually very easy and logical), so for decrypting the message I used the following scipt which is the same as the previous script with a more general phi calculation:
 
 ```python 3
 from Crypto.Util.number import inverse, long_to_bytes
@@ -1271,6 +1272,191 @@ s.close()
 
 ***
 # Scripting
+
+## Dina
+Help! I can't make any sense out of what Dina is saying, can you??
+
+Connect with:
+nc jh2i.com 50035
+
+**flag{dina_speaks_in_dna_and_you_do_too}**
+
+**Disclaimer:** I'll start of with a quick disclaimer, even though I ended solving it using frequency analysis and some common sense, I don't think what I did was the intention of the author, and I used the mapping john showed three or four times to validate a character and escape rabbit holes, though I think it can be done without using it at all if you have  time, and after validating the first few characters I could easily complete the rest myself.\
+oh and another thing, the script I wrote is really ugly but it works well, you can use an empty mapping and remove the question types and it will still work, and I strongly recommend trying this yourself.
+
+**Solution:** With the challenge we are given an host and a port to connect to, when we connect the server sends a string which comprises only of A,C,G,T and waits for input, if we give some random input it will respond with another string like the previous:
+
+![](assets//images//dina_1.png)
+
+It seems to be a DNA sequence and if you have any basic knowledge in biology you'll know that DNA sequences are interpreted by the ribosomes to proteins, and every sequence of 3 nucleic acids in the DNA or equivalently every 3 letters in the DNA which is called a codon is interpeted to one amino acid in the protein, so we can trying using this type of encoding to get a strings consisting of the letters of each matching amino acid, but it will not work.\
+we can next try using binary notations for each nucleic acid and decode the binary to ascii characters but this will also not work, after a google search about DNA encoding to english I stumbled upon this writeup https://github.com/ChapeauR0uge/write-ups/tree/master/b00t2root/crypto/genetics where he uses a mapping from codons to english in order to decode the string, but the mapping didn't seem to help, at this point in the CTF I stopped and moved on to other challenges.\
+After the CTF and during the debrief that john did I discovered that the last thing I tried was kinda right but the mapping was incorrect, so I tried to find the right mapping on the interenet, but I couldn't find it, and so I resorted to the last thing I could think of, to use frequency analysis.
+
+In every alphabet there are charecters which appears more than others in literature or in any written art, for example the letter a appears more than z and e appears more than a, also if we look at all the printable symbols we will also see that the symbol appears more than e or any other characters, we can also look at the frequency of one word or two words and so on and see the same thing.\
+We can use that to our adventage, so I started out by finding a list of frequencies for all the printable symbols (https://www.wired.com/2013/08/the-rarity-of-the-ampersand/) and then wrote a small script which connect to the server a number of times (I used 50) and count the occorunces of every codon in the string and in the end lists them in descending order of occurences (you can see parts of it in the final script), also, in every session the script would try to guess the plaintext using the already mapped characters or otherwise the total number of occurences of the each characters against the list of frequencies, I used it to map the space symbol and e, then map a and t by looking at the ciphertexts and recognizing words (we can easily guess the mapping for a from a one-letter word and the mapping for t from a very frequent three letter-word), admittedly I used john script in the debrief to figure out that the first word in every ciphertext, which is a two-letter word without i, n or t, is a number and and colon (I though initially that it was yo or mr), by using letter frequency and word frequency and most importantly common sense I mapped around ten to fifteen characters, but than I hitted a roadblock, even though most of the encoded sentance is a readable string like "enter the string" the string itself in question is a combination of random letters, for example (actually taken from a run):
+
+`send back yirkbmusswnqmhq as a string`
+
+and for that no frequency analysis would have helped, so I turn to what I do best, bruteforcing every character I can.\
+
+At this point when I had around ten to fifteen characters mapped so sometimes when the sun and the moon would align the random word would be comprised by only mapped letters, and more commonly but still rare I'll get that the string comprises only of mapped codons except one, and we can use the response of the server for this kind of strings to eliminate mappings or discover the actual mapping, and so I upped the number of retries of the script would do to 200, and added that in every session the script would try to recognize the question sent by the server and send back the matching string *upper-cased* (yeah that throw me off for a while), I then manually went through the output and tried to eliminate wrong mapping or to see if the script discovered any correct one (actually when I think of it I could have written a script which automatically does that):
+
+```python 3
+import re
+from pwn import remote
+from random import choice
+
+#  The predicted mapping of the codons
+mapping =   {"AAA":'y',
+             "AAC":'q',
+             "AAG":'k',
+             "AAT":'',
+             "ACA":'q',
+             "ACC":'1',
+             "ACG":'s',
+             "ACT":'0',
+             "AGA":'~',
+             "AGC":'',
+             "AGG":'=',
+             "AGT":'j',
+             "ATA":' ',
+             "ATC":'',
+             "ATG":'i',
+             "ATT":'',
+             "CAA":'',
+             "CAC":'',
+             "CAG":'',
+             "CAT":'',
+             "CCA":'b',
+             "CCC":'',
+             "CCG":'w',
+             "CCT":'v',
+             "CGA":'a',
+             "CGC":'h',
+             "CGG":'',
+             "CGT":'',
+             "CTA":'x',
+             "CTC":'',
+             "CTG":'u',
+             "CTT":'z',
+             "GAA":'',
+             "GAC":'',
+             "GAG":'4',
+             "GAT":'.',
+             "GCA":'3',
+             "GCC":'',
+             "GCG":'/',
+             "GCT":':',
+             "GGA":'o',
+             "GGC":'e',
+             "GGG":'',
+             "GGT":'f',
+             "GTA":'',
+             "GTC":'',
+             "GTG":'p',
+             "GTT":'c',
+             "TAA":'',
+             "TAC":'',
+             "TAG":'2',
+             "TAT":'',
+             "TCA":'r',
+             "TCC":'m',
+             "TCG":',',
+             "TCT":'n',
+             "TGA":'',
+             "TGC":'l',
+             "TGG":'',
+             "TGT":'',
+             "TTA":'<',
+             "TTC":'t',
+             "TTG":'d',
+             "TTT":'g'}
+
+# The type of questions dina asks and the position of the string in them
+question_types = {'send the string': 4,
+                  'send the message': 5,
+                  'send this back': 4,
+                  'go ahead and send': 5,
+                  'back to me': 2,
+                  'enter this back': 7,
+                  'please respond with': 4,
+                  'respond with': 3,
+                  'enter the string': 4,
+                  'please send back': 4,
+                  'send back': 3,
+                  }
+
+
+def beautify_data(msg):
+      return str(msg)[2:-3].replace("\\n","")
+
+# frequency analysis stuff
+frequency = { a: 0 for a in mapping }
+letter_frequency = list(' etaoinsrhldcumfgpywb,.vk-\"_\'x)(;0j1q=2:z/*!?$35>\{\}49[]867\\+|&<%@#^`~.,')
+for i in range(len(letter_frequency)):
+      if letter_frequency[i] in mapping.values():
+            letter_frequency[i] = choice(letter_frequency)
+letter_frequency = ''.join(letter_frequency)
+
+
+host, port  = 'jh2i.com', 50035
+for _ in range(200):
+      s = remote(host,port)
+      index = 0
+      while 1:
+
+            # Recieves until a message is sent
+            ciphertext = ''
+            while ciphertext == '':
+                  ciphertext = beautify_data(s.recv())
+
+            # Checks if the flag is given
+            if 'flag' in ciphertext:
+                  print(ciphertext)
+                  exit(0)
+
+            # Find the frequency of each codon for frequency analysis
+            for i in range(0,len(ciphertext),3):
+                  frequency[ciphertext[i:i+3]] += 1
+            frequency =  {k:frequency[k] for k in sorted(frequency, key= frequency.get, reverse=True)}
+
+            # The mapping letters from frequency analysis
+            frequency_letters = []
+            # The whole plaintext
+            plaintext = []
+            for i in range(0,len(ciphertext),3):
+                  # Checks if the mapping for the codon is known, if not predict a letter otherwise uses the mapping
+                  if mapping[ciphertext[i:i+3]] == '':
+                         plaintext.append(letter_frequency[list(frequency.keys()).index(ciphertext[i:i+3])])
+                         frequency_letters.append((ciphertext[i:i+3],letter_frequency[list(frequency.keys()).index(ciphertext[i:i+3])]))
+                  else:
+                        plaintext.append(mapping[ciphertext[i:i+3]])
+
+            plaintext = ''.join(plaintext)
+            if 'nope' in plaintext:
+                  break
+
+            print(ciphertext)
+            print(plaintext)
+            print(str(index) + ": " + str(frequency_letters))
+
+            response = ''
+            for q in question_types.keys():
+                  if q in plaintext:
+                        response = plaintext.split(" ")[question_types[q]]
+                        break
+
+            print(response)
+            s.send(response.upper())
+            index += 1
+
+print(frequency)
+```
+and oh boy did it worked, after a little more than an hour I suceeded in finding out a mapping for every used codon and get the flag:
+
+![](assets//images//dina_2.png)
+
+actually the mapping is not spot-on for numbers but because the string only comprises of  letters this is not that crucial.
 
 ## Rotten
 Ick, this salad doesn't taste too good!
