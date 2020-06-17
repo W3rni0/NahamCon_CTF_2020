@@ -38,7 +38,7 @@ This is my writeup for the challenges in NahamCon CTF, I mainly focused on crypt
   - [Ooo-la-la](#ooo-la-la)
   - [Unvreakable Vase](#unvreakable-vase)
   - [December](#december)
-  - [Respberry](#respberry)
+  - [Raspberry](#raspberry)
 * [Forensics](#forensics)
   - [Microsooft](#microsooft)
   - [Cow Pie](#cow-pie)
@@ -71,7 +71,7 @@ https://ctf.nahamcon.com/rules
 
 **flag{we_hope_you_enjoy_the_game}**
 
-**Solution:** The flag is commented close to the end of the source for the rules pages, right after the elements of the prizes:
+**Solution:** The flag is commented close to the end of the source code for the rules pages, right after the elements for the prizes:
 
 ![](assets//images//read_the_rules.png)
 
@@ -131,7 +131,7 @@ http://jh2i.com:50032
 
 ![](assets//images//mr_robot.png)
 
-There doesn't seem to be much in the index page, but we can guess by the name of the challenge that there is something in the robots.txt file for the website, robots.txt is a file which helps search engines (crawlers in general) to index the site correcrly, in most sites nowadays there is a robots.txt file, if we look at the file ( the link is http://jh2i.com:50032/robots.txt ) we get the flag:
+There doesn't seem to be much in the index page, but we can guess by the name of the challenge that there is something in the robots.txt file for the website, robots.txt is a file which helps search engines (crawlers in general) to index the site correctly, in most sites nowadays there is a robots.txt file, if we look at the file ( the link is http://jh2i.com:50032/robots.txt ) we get the flag:
 
 ![](assets//images//mr_robot_2.png)
 
@@ -189,10 +189,10 @@ Download the file below.
 
 ![](assets//images//easy_keesy.png)
 
-This type of files are databases used to keep passwords on the computer 'safely', there are many password manager to view this kind of files but I used KeeWeb for this challenge mostly because it is a web tool, if we try to open the file with it we can quickly notice that we don't have the password for doing that, furthermore there aren't any mentions of a password in the file or in the description of the challenge, so it seems we need to bruteforce for the password.\
-Passwords are commonly saved as hashes, hashes are data created using cryptographic hash functions which are one way functions (easy to find an hash for a password, hard to find a password for the hash) who are also able to return a value with a fixed length to any file with any size, a simple example for an hash function is the algorithm shown in december with the slight modefication that only the last block of the cipher is returned, hashes are great because it is easy to validate a value using them as you can just as hash the value using the hash function and compare the hashes, but, it is hard to get the value from an hash.\
+This type of files are databases used to keep passwords on the computer 'safely', there are many password managers to view this kind of files but I used KeeWeb for this challenge mostly because it is a web tool, if we try to open the file with it we can quickly notice that we don't have the password for doing that, furthermore there aren't any mentions of a password in the file or in the description of the challenge, so it seems we need to bruteforce for the password.\
+Passwords are commonly saved as hashes, hashes are data created using cryptographic hash functions which are one way functions (easy to find an hash for a password, hard to find a password for the hash) who are also able to return a value with a fixed length to any file with any size, a simple example for an hash function is the algorithm shown in the December challenge with the slight modification that only the last block of the cipher is returned, hashes are great because it is easy to validate a value using them as you can just as hash the value using the hash function and compare the hashes, but, it is hard to get the value from an hash.\
 In the case of a KeePass database file, the password for the database, which is called a master password, is saved as an hash in the file in order for a password manager to verify it, this is not a smart idea to save the password locally like that but it's good for us.\
-To find the password I used a dictionary attack, this type of attack uses a known database in order to find the right data, in the case of password cracking we use a database of passwords, preferably ordered by most frequently used to least frequently used, we will hash each password and compare it to the hash we have until we'll find a password with the same one, this does not guarantee that we found the correct password but most probably it will find the correct one (this is caused by the birthday paradox, I linked a site which explains it in the resources), the dictionary I used is called rockyou.txt which lists common passwords. for executing the attack I used John the Ripper, a great tool for cracking hashes using a dictionary, I first converted the file to something john can use and then used john with rockyou.txt to crack the password by executing the following commands:
+To find the password I used a dictionary attack, this type of attack uses a known database in order to find the right data, in the case of password cracking we use a database of passwords, preferably ordered by most frequently used to least frequently used, we will hash each password and compare it to the hash we have until we'll find a password with the same one, this does not guarantee that we found the correct password (an hash collision can occur) but most probably it will find the correct one, the dictionary I used is called rockyou.txt which lists common passwords. for executing the attack I used John the Ripper, a great tool for cracking hashes using a dictionary, I first converted the file to something john can use and then used john with rockyou.txt to crack the password by executing the following commands:
 
 ```bash
 keepass2john easy_keesy > kp
@@ -209,7 +209,8 @@ by doing that we get that the password for the file is monkeys, if we try using 
 * rockyou.txt: https://wiki.skullsecurity.org/Passwords
 * John the Ripper: https://tools.kali.org/password-attacks/john
 * cryptographic hash function (CHF): https://en.wikipedia.org/wiki/Cryptographic_hash_function
-* The birthday paradox: https://en.wikipedia.org/wiki/Birthday_problem
+
+
 
 ## Peter Rabbit
 Little Peter Rabbit had a fly upon his nose, and he flipped it and he flapped it and it flew away!
@@ -217,7 +218,7 @@ Little Peter Rabbit had a fly upon his nose, and he flipped it and he flapped it
 Download the file below.\
 [peter.png](assets//images//peter.png)
 
-**Post-CTF**
+**Post CTF Writeup**
 
 **flag{ohhhpietwastherabbit}**
 
@@ -232,7 +233,7 @@ this is actually an esoteric programming language called piet, named after the a
 
 **Resources:**
 * Piet: https://www.dangermouse.net/esoteric/piet.html
-* Esotaric Programming Language: https://en.wikipedia.org/wiki/Esoteric_programming_language
+* Esoteric Programming Language: https://en.wikipedia.org/wiki/Esoteric_programming_language
 * Piet online interpreter: https://www.bertnase.de/npiet/npiet-execute.php
 
 
@@ -251,7 +252,7 @@ Download the file below.
 ![](assets//images//pang_1.png)
 
 The tool tells us that there is an CRC error in the IHDR chunk, the IHDR is the first chunk in a PNG image and the CRC value is a value stored for every chunk in the image to verify the authenticity of the data (I explained more about CRC and IHDR in my writeup for the challenges in RACTF 2020 listed in the resources).\
-We can fix the image by changing value of the CRC, I prefer to do it using an hex viewer so we can have a clear understaing of the data, the changes are marked in red:
+We can fix the image by changing value of the CRC, I prefer to do it using an hex viewer so we can have a clear understanding of the data, the changes are marked in red:
 
 ![](assets//images//pang_2.png)
 ![](assets//images//pang_3.png)
@@ -281,7 +282,7 @@ https://apporima.com/
 
 ![](assets//images//time_keeper.png)
 
-we can use a site called wayback machine (linked in resources) to view older versions of sites, it seems that there is only one older version on site from the 18th of april, and there is a snapshot of the index page:
+we can use a site called Wayback Machine (linked in resources) to view older versions of sites, it seems that there is only one older version of the site from the 18th of april, and there is a snapshot of the index page:
 
 ![](assets//images//time_keeper_2.png)
 
@@ -321,7 +322,7 @@ This time we have a username. Can you track down `NahamConTron`?
 
 **flag{i_feel_like_that_was_too_easy}**
 
-**Solution:** In this challenge we need to track down a username, luckily there is a tool called Sherlock that does just that, it searches popular sites such as github, twitter, instegram and etc. for an account with the given username, and returns a list to the profiles, we can run it using the following command:
+**Solution:** In this challenge we need to track down a username, luckily there is a tool called Sherlock that does just that, it searches popular sites such as GitHub, Twitter, Instagram and etc. for an account with the given username, and returns a list to the profiles, we can run it using the following command:
 
 `python3 sherlock NahamConTron`
 
@@ -371,7 +372,7 @@ the first file to pop into view is the .bash_history file, it contains the comma
 ```bash
 ssh -i config/id_rsa nahamcontron@jh2i.com -p 50033
 ```
-so we now know the user has connected to a server using the SSH protocol (Secure Shell protocol) with an SSH private key, and we also know that the key is in a config folder .... intesting, maybe it is the same folder as the one in the repo?
+so we now know the user has connected to a server using the SSH protocol (Secure Shell protocol) with an SSH private key, and we also know that the key is in a config folder .... interesting, maybe it is the same folder as the one in the repo?
 
 ![](assets//images//tron_5.png)
 
@@ -441,7 +442,7 @@ Download the file below.
   <img src="assets//images//luke.jpg">
 </p>
 
-We can infer by the challenge name and the challenge description that we need to use Jsteg (link in the resources), this is a type of tool for hiding data in the least segnificant bit (LSB) of the bytes in the image, this image is actually an image of the creator of the tool (whose name is luke), I only succeeded in using the tool by running the main.go script that's in jsteg/cmd/jsteg using the following command:
+We can infer by the challenge name and the challenge description that we need to use Jsteg (link in the resources), this is a type of tool for hiding data in the least significant bit (LSB) of the bytes in the image, this image is actually an image of the creator of the tool (whose name is luke), I only succeeded in using the tool by running the main.go script that's in jsteg/cmd/jsteg using the following command:
 
 ![](assets//images//luke_1.png)
 
@@ -483,7 +484,7 @@ Download the file below.
 
 **flag{do_you_speak_the_beep_boop}**
 
-**Solution:** Now we are given for a change a WAV file (Wave audio file), in it we can hear key presses of a phone, this is actually DTMF (daul tone multi frequency) which were used to signal to the phone company that a specific key was pressed and they have quite a lot of history with respect to hacking, we can actually decipher this tones using a tool called multimon-ng or using the web tool listed below, this will give us the folloiwing code:
+**Solution:** Now we are given for a change a WAV file (Wave audio file), in it we can hear key presses of a phone, this is actually DTMF (dual tone multi frequency) which were used to signal to the phone company that a specific key was pressed and they have quite a lot of history with respect to hacking, we can actually decipher this tones using a tool called multimon-ng or using the web tool listed below, this will give us the following code:
 
 ```
 46327402297754110981468069185383422945309689772058551073955248013949155635325
@@ -584,7 +585,7 @@ There is a flag in my swap!
 Download the file below.\
 [deadswap](assets//files//deadswap)
 
-**PostCTF writeup**
+**Post CTF Writeup**
 
 **flag{what_are_you_doing_in_my_swap}**
 
@@ -613,11 +614,11 @@ Do you hear the flag? Maybe if you walk through it one step at a time.
 Download the file below.\
 [wazaa.wav](assets//files//wazaa.wav)
 
-**PostCTF writeup**
+**Post CTF Writeup**
 
 **flag{do_that_bit_again}**
 
-**Solution:** We are given a WAV audio file with the challenge, I personally hate steganography that is related to audio, if it is not spectogram and wavsteg can't find something I just quit...but i'm a completionist, so I'll cover that as well, we need to use a tool called wav-steg-py which is listed in the resources using this command to extract the flag:
+**Solution:** We are given a WAV audio file with the challenge, I personally hate steganography that is related to audio, if it is not spectogram and wavsteg can't find something I just quit...but I'm a completionist, so I'll cover that as well, we need to use a tool called wav-steg-py which is listed in the resources using this command to extract the flag:
 
 `python3 wav-steg.py -r -s wazaaa.wav -o a -n 1 -b 1000`
 
@@ -638,7 +639,7 @@ Note, this flag is not in the usual format
 Download the file below.\
 [hackers.bmp](assets//images//hackers.bmp)
 
-**PostCTF**
+**Post CTF Writeup**
 
 **JCTF{at_least_the_movie_is_older_than_this_software}**
 
@@ -646,14 +647,13 @@ Download the file below.\
 
 ![](assets//images//hackers.bmp)
 
-bmp format is a quite old file format and rarely used today as its compression algorithm is really not good and rarely supported so it's not very efficient in space to save images as bmp files, especially if you consider the image quality nowadays, the flag is again hidden in the least significant bits of the image and again I tried checking that during the CTF and got nothing, a smarter approach is to use zsteg, which checks all the availiable channels and even checks the most significant bit for hidden data, we can get the flag using the following command:
+bmp format is a quite old file format and rarely used today as its compression algorithm is really not good and rarely supported so it's not very efficient in space to save images as bmp files, especially if you consider the image quality nowadays, the flag is again hidden in the least significant bits of the image and again I tried checking that during the CTF and got nothing, a smarter approach is to use zsteg, which checks all the available channels and even checks the most significant bit for hidden data, we can get the flag using the following command:
 
 `zsteg -a hackers.bmp`
 
 and in action:
 
 ![](assets//images//oldschool.png)
-
 
 ***
 # Cryptography
@@ -666,11 +666,11 @@ Download the file below.\
 
 **flag{xor_is_not_for_security}**
 
-**Solution:** We get an unknown file with the challenge, obviously from the challenge description and challenge name we know that the file is xored and that the key is of length 4, if we look at the hex dump of the file we can notice this reaccuring pattern of bytes `\x5a\x41\x99\xbb` :
+**Solution:** We get an unknown file with the challenge, obviously from the challenge description and challenge name we know that the file is xored and that the key is of length 4, if we look at the hex dump of the file we can notice this reoccurring pattern of bytes `\x5a\x41\x99\xbb` :
 
 ![](assets//images/docxor_1.png)
 
-furthermore if we analyse the frequency of the bytes in the file we get the following graph where the peaks are in \x5a, \x41, \x99 and \xbb:
+furthermore if we analyze the frequency of the bytes in the file we get the following graph where the peaks are in \x5a, \x41, \x99 and \xbb:
 
 ![](assets//images/docxor_2.png)
 
@@ -753,10 +753,10 @@ this script is used for decrypting the cipher but it doesn't seem to work well:
 it somewhat stops printing at this point but still runs, we can guess by that the code is inefficient, we can try to understand what the script does to figure out how to make it more efficient, we can see that the script decode the ciphertext from base64 to bytes, then for each byte in the ciphertext it tries to find a value of next value for num such that both functions a and b returns a boolean value of True, then xors that value with the value of the byte and prints the result, it continues likes that for the succeeding bytes while continuously increasing the value of num by one, but, by the 13th byte the value of num is jumped to 50000 and by the 26th byte the value of num is jumped to 500000.
 
 Now let's look at the functions, a checks if there are no numbers bigger than 2 and smaller than the input that can divide it without a remainder, so a checks if the input is prime.
-The function b checks if the input is equal to itself in revese so b checks if the input is a palidrome.
+The function b checks if the input is equal to itself in reverse so b checks if the input is a palindrome.
 a return True if the number is prime and b checks if the number is a palindrome, so the values that are xorred with the bytes of the cipher are palindromic primes
 
-if we take a second look at the function a we can see that it is very inefficent as it checks for all the numbers that are smaller than the input if they can divide it without a remainder, we can replace it with the primality test in the sympy module, which uses an efficient method (Rabin-Miller Strong Pseudoprime Test), in the end we get the less obfuscated following script:
+if we take a second look at the function a we can see that it is very inefficient as it checks for all the numbers that are smaller than the input if they can divide it without a remainder, we can replace it with the primality test in the sympy module, which uses an efficient method (Rabin-Miller Strong Pseudoprime Test), in the end we get the less obfuscated following script:
 
 ```python 3
 import base64
@@ -814,11 +814,11 @@ Connect with:\
 
 we can guess that this is an RSA encryption, I explained more about how RSA works in my writeup for RACTF 2020:
 
-> ... RSA is a public key cipher, which means that there are two keys, one that is public which is used to encrypt data, and one that is private which is used to decrpyt data, obviously there is some sort of connection between the keys but it is hard to reveal the private key from the public keys (and in this case vice versa), specificly in RSA in order to find the private key we need to solve the integer factorazition problem, which is thought to be in NP/P (this is not important for the challenge), we will call our public key e and our private key d, they posses the following attribute - d multiply by e modulo the value of (p-1) * (q-1) which we will name from now phi, is equal to 1, we will call d the modular multiplicative inverse of e and e the modular multiplicative inverse of d, futhermore if we take a plaintext message pt and raise it to the power of d and then to the power of e modulo the value of p * q, which we will name n and will be commonly given to us insted of q and p, we will get pt again (to understand why it is needed to delve into modern algebra, if n is smaller than pt then obviously we will not get pt), now with that in mind we can talk about the cipher, encrpytion in this cipher is raising the plaintext pt to the power of the public key e mod the value of n, simillarly, decryption is raising the ciphertext to the power of d mod n...
+> ... RSA is a public key cipher, which means that there are two keys, one that is public which is used to encrypt data, and one that is private which is used to decrypt data, obviously there is some sort of connection between the keys but it is hard to reveal the private key from the public keys (and in this case vice versa), specifically in RSA in order to find the private key we need to solve the integer factorization problem, which is thought to be in NP/P (this is not important for the challenge), we will call our public key e and our private key d, they posses the following attribute - d multiply by e modulo the value of (p-1) * (q-1) which we will name from now phi, is equal to 1, we will call d the modular multiplicative inverse of e and e the modular multiplicative inverse of d, furthermore if we take a plaintext message pt and raise it to the power of d and then to the power of e modulo the value of p * q, which we will name n and will be commonly given to us instead of q and p, we will get pt again (to understand why it is needed to delve into modern algebra, if n is smaller than pt then obviously we will not get pt), now with that in mind we can talk about the cipher, encryption in this cipher is raising the plaintext pt to the power of the public key e mod the value of n, similarly, decryption is raising the ciphertext to the power of d mod n...
 
 and I explained why it works and how we can break the cipher:
 
->...for that we need to talk about factors, factors are numbers which can be divided only by 1 and themself (we are only talking about whole numbers), we have discovered that there are infinitly many factors and that we can represent any number as the multiplication of factors, but, we havent discovered an efficient way to find out which factors make up a number, and some will even argue that there isn't an efficient way to do that (P vs. NP and all that), which means that if we take a big number, it will take days, months and even years to find out the factors which makes it, but, we have discovered efficient ways to find factors, so if I find 2 factors, which are favorably big, I multiply them and post the result on my feed to the public, it will take a lot of time for people to discover the factors that make up my number. But, and a big but, if they have a database of numbers and the factors that make them up they can easily find the factors for each numbers I will post, and as I explained before, if we can the factors we can easily calculate phi and consequently calculate d, the private key of RSA, and break the cipher, right now there are databases (listed below) with have the factors to all the numbers up to 60 digits (if I remember correctly), which is a lot but not enough to break modern RSA encryptions, but if we look at the challenge's parameters, we can see that n is awefully small, small enough that it most be in some databases...
+>...for that we need to talk about factors, factors are numbers which can be divided only by 1 and himself (we are only talking about whole numbers), we have discovered that there are infinitely many factors and that we can represent any number as the multiplication of factors, but, we haven't discovered an efficient way to find out which factors make up a number, and some will even argue that there isn't an efficient way to do that (P vs. NP and all that), which means that if we take a big number, it will take days, months and even years to find out the factors which makes it, but, we have discovered efficient ways to find factors, so if I find 2 factors, which are favorably big, I multiply them and post the result on my feed to the public, it will take a lot of time for people to discover the factors that make up my number. But, and a big but, if they have a database of numbers and the factors that make them up they can easily find the factors for each numbers I will post, and as I explained before, if we can the factors we can easily calculate phi and consequently calculate d, the private key of RSA, and break the cipher, right now there are databases (listed below) with have the factors to all the numbers up to 60 digits (if I remember correctly), which is a lot but not enough to break modern RSA encryptions, but if we look at the challenge's parameters, we can see that n is awefully small, small enough that it most be in some databases...
 
 if we search for the value of n in factorDB, a database for the factors of numbers, we can find factors for the value of n given to us:
 
@@ -895,7 +895,7 @@ Ah shoot, I dropped this data and now it's all squished and flat. Can you make a
 Download the file below.\
 [prompt.txt](assets//files//vase.txt)
 
-**PostCTF Writeup**
+**Post CTF Writeup**
 
 **flag{does_this_even_count_as_cryptooo}**
 
@@ -905,13 +905,13 @@ Download the file below.\
 zmxhz3tkb2vzx3roaxnfzxzlbl9jb3vudf9hc19jcnlwdg9vb30=
 ```
 
-this seems to be base64 encoding, but if you try to decode it from base64 to ascii you dont get much:
+this seems to be base64 encoding, but if you try to decode it from base64 to ascii you don't get much:
 ```
 ÎlaÏ{dokóÇzèk.ßÏ.ån_co{îuÿas_crypv.oo}
 ```
 
 I didn't actually managed to solve this challenge by myself during the CTF thinking it is a combination between rail cipher and base64 but actually that is just a base64 encoding where all the upper cased letters were lowered, we can try going over all combination of lower case and upper case for all the characters in the string but it will take two to the power of the length of the string, which is 2 to the power of 52 at most and at least 2 to the power of 40 if we exclude numbers and symbol, which is still a lot.\
-But, we can do something else, base64 is using characters to represents the numbers from 0 to 63, if w'ill encode one letter from base64 to binary we get a binary string of length 6 bits, but each ascii character take 8 bits to encode, so if we want to find the smallest ascii substring that decodes to a base64 string without padding we'll need to find a lowest common multiple (LCM) value, for those numbers the LCM is 24, and s0 every 24/8 = 3 ascii characters are encoded to 24/6 = 4 base64 characters without padding and if we will split our ciphertext to blocks of 4 characters and try every possible combination of upper case and lower case on every character in each block until we get a readable substring (preferably of the flag which very likely though not guaranteed) w'ill need to try at most 2 to the power of 4 multipled by the number of blocks for every block, in out case `(2 ** 4) * (52 / 4) = (2 ** 4) * 12` which is a lot less then what we had before, for that I wrote the following script which goes through every block in the ciphertext and tries all the possible combinations until the ascii strings decoded from the block are printable (in the range from space \x20 to tilda \x7e):
+But, we can do something else, base64 is using characters to represents the numbers from 0 to 63, if we'll encode one letter from base64 to binary we get a binary string of length 6 bits, but each ascii character take 8 bits to encode, so if we want to find the smallest ascii substring that decodes to a base64 string without padding we'll need to find a lowest common multiple (LCM) value, for those numbers the LCM is 24, and s0 every 24/8 = 3 ascii characters are encoded to 24/6 = 4 base64 characters without padding and if we will split our ciphertext to blocks of 4 characters and try every possible combination of upper case and lower case on every character in each block until we get a readable substring (preferably of the flag which very likely though not guaranteed) we'll need to try at most 2 to the power of 4 multiplied by the number of blocks for every block, in out case `(2 ** 4) * (52 / 4) = (2 ** 4) * 12` which is a lot less then what we had before, for that I wrote the following script which goes through every block in the ciphertext and tries all the possible combinations until the ascii strings decoded from the block are printable (in the range from space \x20 to tilde \x7e):
 
 ```python 3
 import base64
@@ -982,10 +982,10 @@ and the ciphertext:
 Ö¢oåÇ\"àT^N@]XõêiùÔ1÷UWETR^DˆžbÿÑ\*á^VAAVCç¤nÿÌIô]RTLE[ZDÝ£yÉÃ/ÍXl]RTWN7
 ```
 
-We can see from the script that it uses DES, DES (Data Encryption Standard) is a type of symmetric cipher that was used in the 80s and the 90s as the standard cipher replaced by AES in the following years, it was invented by IBM with the help of the NSA (yeah that NSA) and in the 90s   people have discovered ways to crack the cipher in a metter of hours (22 hours and 15 minutes to be precise).\
-This cipher also has a lot of weaknesses, one of those are the existence of weak keys, decryption and encrpytion with this keys have the same effect and so encrypting some data twice with the same weak key is equivalent to decryting the encryption and the ciphertext is equal to the original plaintext.
+We can see from the script that it uses DES, DES (Data Encryption Standard) is a type of symmetric cipher that was used in the 80s and the 90s as the standard cipher replaced by AES in the following years, it was invented by IBM with the help of the NSA (yeah that NSA) and in the 90s   people have discovered ways to crack the cipher in a matter of hours (22 hours and 15 minutes to be precise).\
+This cipher also has a lot of weaknesses, one of those are the existence of weak keys, decryption and encryption with this keys have the same effect and so encrypting some data twice with the same weak key is equivalent to decrypting the encryption and the ciphertext is equal to the original plaintext.
 
-we can also notice that the cipher uses OFB mode of operation, in this mode the plaintext is splitted to blocks of 8 bytes and for each block of plaintext the mode encrypts the encryption of the previous block (in the case of the first block this mode encrypts IV) and xors the new encryption with the plaintext, in a visual representation:
+we can also notice that the cipher uses OFB mode of operation, in this mode the plaintext is split to blocks of 8 bytes and for each block of plaintext the mode encrypts the encryption of the previous block (in the case of the first block this mode encrypts IV) and xors the new encryption with the plaintext, in a visual representation:
 
 <p align="center">
   <img src="assets//images//december_1.png" style="background-color:white;" />
@@ -1003,7 +1003,7 @@ we can now notice the following attribute of using weak keys in this mode of ope
   <img src="assets//images//december_3.png" style="background-color:white;" />
 </p>
 
-in other words, for every block in an even position we get that the encryption with a weak key is equal to xorring IV with the plaintext, so the plaintext for block in an even position is equal to the ciphertext xorred with IV, let's try that on our cipherext, we can do that using the following code:
+in other words, for every block in an even position we get that the encryption with a weak key is equal to xorring IV with the plaintext, so the plaintext for block in an even position is equal to the ciphertext xorred with IV, let's try that on our ciphertext, we can do that using the following code:
 
 ```python 3
 from Crypto.Util.strxor import strxor
@@ -1049,7 +1049,7 @@ and we get the flag:
 ![](assets//images//december_5.png)
 
 
-## Respberry
+## Raspberry
 Raspberries are so tasty. I have to have more than just one!
 
 Download the file below.\
@@ -1057,7 +1057,8 @@ Download the file below.\
 
 **flag{there_are_a_few_extra_berries_in_this_one}**
 
-**Solution:**: With the chellenge we are get a text file, the content of the text file is:
+**Solution:**: With the challenge we are get a text file, the content of the text file is:
+
 ```
 n = 7735208939848985079680614633581782274371148157293352904905313315409418467322726702848189532721490121708517697848255948254656192793679424796954743649810878292688507385952920229483776389922650388739975072587660866986603080986980359219525111589659191172937047869008331982383695605801970189336227832715706317
 e = 65537
@@ -1067,7 +1068,7 @@ This is again an RSA cipher, if we try plugging the value of n to a factor datab
 
 ![](assets//images//respberry.png)
 
-this is a big amount of factors, this amount is actually okay as RSA is not limited to only 2 factors (but it is really bad practice to use a lot of factors), phi is actually the value of euler's totient function for n, this value is the number of values smaller than n which don't have common factors with n, and this value is actually equal to multiplication of all the factors reduced by one each (the proof for that is actually very easy and logical), so for decrypting the message I used the following scipt which is the same as the previous script with a more general phi calculation:
+this is a big amount of factors, this amount is actually okay as RSA is not limited to only 2 factors (but it is really bad practice to use a lot of factors), phi is actually the value of Euler's totient function for n, this value is the number of values smaller than n which don't have common factors with n, and this value is actually equal to multiplication of all the factors reduced by one each (the proof for that is actually very easy and logical), so for decrypting the message I used the following script which is the same as the previous script with a more general phi calculation:
 
 ```python 3
 from Crypto.Util.number import inverse, long_to_bytes
@@ -1092,7 +1093,6 @@ By running this script we get the flag:
 
 **Resources:**
 * Euler's totient function: https://en.wikipedia.org/wiki/Euler%27s_totient_function
-
 
 ***
 
@@ -1169,7 +1169,6 @@ Download the file below.
 **flag{rev3rsIng_ApKs_l1k3_A_Pr0}**
 
 **Solution:** open the apk file in jadx-gui and get a base64 encoded url in the `MainActivity` and visit the page with useragent `volley/0`
-
 
 ***
 # Miscellaneous
@@ -1277,8 +1276,9 @@ s.close()
 Help! I can't make any sense out of what Dina is saying, can you??
 
 Connect with:
-nc jh2i.com 50035
+`nc jh2i.com 50035`
 
+**Post CTF Writeup**
 **flag{dina_speaks_in_dna_and_you_do_too}**
 
 **Disclaimer:** I'll start of with a quick disclaimer, even though I ended solving it using frequency analysis and some common sense, I don't think what I did was the intention of the author, and I used the mapping john showed three or four times to validate a character and escape rabbit holes, though I think it can be done without using it at all if you have  time, and after validating the first few characters I could easily complete the rest myself.\
@@ -1288,12 +1288,12 @@ oh and another thing, the script I wrote is really ugly but it works well, you c
 
 ![](assets//images//dina_1.png)
 
-It seems to be a DNA sequence and if you have any basic knowledge in biology you'll know that DNA sequences are interpreted by the ribosomes to proteins, and every sequence of 3 nucleic acids in the DNA or equivalently every 3 letters in the DNA which is called a codon is interpeted to one amino acid in the protein, so we can trying using this type of encoding to get a strings consisting of the letters of each matching amino acid, but it will not work.\
-we can next try using binary notations for each nucleic acid and decode the binary to ascii characters but this will also not work, after a google search about DNA encoding to english I stumbled upon this writeup https://github.com/ChapeauR0uge/write-ups/tree/master/b00t2root/crypto/genetics where the author uses a mapping from codons to english in order to decode the string, but the mapping didn't seem to help, at this point in the CTF I stopped and moved on to other challenges.\
+It seems to be a DNA sequence and if you have basic knowledge in biology you'll know that DNA sequences are interpreted by the ribosomes to proteins, and every sequence of 3 nucleic acids in the DNA or equivalently every 3 letters in the DNA which is called a codon is interpreted to one amino acid in the protein, so we can trying using this type of encoding to get a strings consisting of the letters of each matching amino acid, but it will not work.\
+we can next try using binary notations for each nucleic acid and decode the binary to ascii characters but this will also not work, after a google search about DNA encoding to English I stumbled upon this writeup https://github.com/ChapeauR0uge/write-ups/tree/master/b00t2root/crypto/genetics where the author uses a mapping from codons to English in order to decode the string, but the mapping didn't seem to help, at this point in the CTF I stopped and moved on to other challenges.\
 After the CTF and during the debrief that john did I discovered that the last thing I tried was kinda right but the mapping was incorrect, so I tried to find the right mapping on the internet, but I couldn't find it, and so I resorted to the last thing I could think of, to use frequency analysis.
 
 In every alphabet there are characters who appear more than others, for example the letter a appears more than z and e appears more than a, also if we look at all the printable symbols we will also see that the space symbol appears more than e or any other characters, we can also look at the frequency of one word or two words and so on and see the same trend.\
-We can use that to our adventage, so I started out by finding a list of frequencies for all the printable symbols (https://www.wired.com/2013/08/the-rarity-of-the-ampersand/) and then wrote a small script which connect to the server a number of times (I used 50) and count the occurrences of every codon in the string and in the end lists them in descending order of occurences (you can see parts of it in the final script), also, in every session the script would try to guess the plaintext using the already mapped codons or the total number of occurences of the each codons against the list of frequencies of symbols if it was not mapped, I used it to map codons to the space symbol and e, then map to a and t by looking at the ciphertexts and recognizing words (we can easily guess the mapping for a from a one-letter word and the mapping for t and h from a very frequent three letter-word), admittedly I used john script in the debrief to figure out that the first word in every ciphertext, which is a two-letter word without i, n or t, is a number and and colon (I though initially that it was yo or mr), by using letter frequency and word frequency and most importantly common sense I mapped around ten to fifteen codons to characters, but than I hitted a roadblock, even though most of the encoded sentance is a readable string like "enter the string" the string in question is a combination of random letters, for example (actually taken from a run):
+We can use that to our advantage, so I started out by finding a list of frequencies for all the printable symbols (https://www.wired.com/2013/08/the-rarity-of-the-ampersand/) and then wrote a small script which connect to the server a number of times (I used 50) and count the occurrences of every codon in the string and in the end lists them in descending order of occurrences (you can see parts of it in the final script), also, in every session the script would try to guess the plaintext using the already mapped codons or the total number of occurrences of the each codons against the list of frequencies of symbols if it was not mapped, I used it to map codons to the space symbol and e, then map to a and t by looking at the ciphertexts and recognizing words (we can easily guess the mapping for a from a one-letter word and the mapping for t and h from a very frequent three letter-word), admittedly I used john script in the debrief to figure out that the first word in every ciphertext, which is a two-letter word without i, n or t, is a number and and colon (I though initially that it was yo or mr), by using letter frequency and word frequency and most importantly common sense I mapped around ten to fifteen codons to characters, but than I hit a roadblock, even though most of the encoded sentence is a readable string like "enter the string" the string in question is a combination of random letters, for example (actually taken from a run):
 
 `send back yirkbmusswnqmhq as a string`
 
@@ -1456,7 +1456,7 @@ for _ in range(200):
 
 print(frequency)
 ```
-nd oh boy did it worked, after a little more than an hour I suceeded in finding out a mapping for every used codon and get the flag:
+and oh boy did it worked, after a little more than an hour I succeeded in finding out a mapping for every used codon and get the flag:
 
 ![](assets//images//dina_2.png)
 
@@ -1484,7 +1484,7 @@ http://jh2i.com:50003
 
 **JCTF{spoooooky_ghosts_in_storage}**
 
-**Solution:** In javascript code for jquerty.jscroll2 after beutifying, flag variable contains flag in bytes
+**Solution:** In JavaScript code for jquerty.jscroll2 after beautifying, flag variable contains flag in bytes
 
 ## Phphonebook
 Ring ring! Need to look up a number? This phonebook has got you covered! But you will only get a flag if it is an emergency!
@@ -1498,7 +1498,7 @@ http://jh2i.com:50002
 
 ![](assets//images//phphonebook_1.png)
 
-so the site tells us that the php source for the page accepts parameters...oooh we might have LFI (local file inclusion), php allows the inclusion of files from the server as parameters in order to extend the functionality of the script or to use code from other files, but if the script is not sanitising the input as needed (filtering out sensitive files) an attacker can include any arbitrary file on the web server or atleast use what's not filtered to his adventage, php scripts stay in the server-side and should not be revealed to the client-side as it may contain sensitive data (and there is no use to it in the client-side), if we want to leak the php files we'll need to encode or encrypt the data as the LFI vulnrable php code will read the file as code and execute it, we can do such things using the php://filter wrapper, using this wrapper in the following way will leak the php source code for index page:
+so the site tells us that the php source for the page accepts parameters...oooh we might have LFI (local file inclusion), php allows the inclusion of files from the server as parameters in order to extend the functionality of the script or to use code from other files, but if the script is not sanitizing the input as needed (filtering out sensitive files) an attacker can include any arbitrary file on the web server or at least use what's not filtered to his advantage, php scripts stay in the server-side and should not be revealed to the client-side as it may contain sensitive data (and there is no use to it in the client-side), if we want to leak the php files we'll need to encode or encrypt the data as the LFI vulnerable php code will read the file as code and execute it, we can do such things using the php://filter wrapper, using this wrapper in the following way will leak the php source code for index page:
 
 `http://jh2i.com:50002/index.php?file=php://filter/convert.base64-encode/resource=index.php`
 
@@ -1603,8 +1603,8 @@ we can now tell by this line `include(str_replace('.php','',$_GET['file']).".php
   </body>
 </html>
 ```
-by the end of the code there is a php segmant where the method extract is used on $_POST and then there is a check if $emergency is set, if so the code echoes the content of a file called flag.txt.\
-this is really intesting, I'll explain the gist of it mainly because i'm not so strong at php, the $_POST is the array of variables passed to the script when an HTTP POST request is sent to it (we commonly use 2 type of HTTP request, POST and GET, where GET asks from the server to return some resource for example the source for a page, and POST also sends variables to a file in the server in the request body), the extract method extracts the variables from the array, the extracted variable name is set to the name passed in the HTTP request and the value is set to the corresponding value, the isset method just checks if there is a variable with this name, by all this we can infer that we need to send a POST request to the server with a variable named emergency which has some arbitrary value in order to get the server to print the flag, we can do so using curl or using a proxy like burp suite like I will show first, we need to set burp suite as our proxy and send a post request to the server, we can do such that using the submit button in the phphonebook page:
+by the end of the code there is a php segment where the method extract is used on $\_POST and then there is a check if $emergency is set, if so the code echoes the content of a file called flag.txt.\
+this is really interesting, I'll explain the gist of it mainly because I'm not so strong at php, the $_POST is the array of variables passed to the script when an HTTP POST request is sent to it (we commonly use 2 type of HTTP request, POST and GET, where GET asks from the server to return some resource for example the source for a page, and POST also sends variables to a file in the server in the request body), the extract method extracts the variables from the array, the extracted variable name is set to the name passed in the HTTP request and the value is set to the corresponding value, the isset method just checks if there is a variable with this name, by all this we can infer that we need to send a POST request to the server with a variable named emergency which has some arbitrary value in order to get the server to print the flag, we can do so using curl or using a proxy like burp suite like I will show first, we need to set burp suite as our proxy and send a post request to the server, we can do such that using the submit button in the phphonebook page:
 
 ![](assets//images//phphonebook_3.png)
 
@@ -1612,7 +1612,7 @@ burp suite catches the request and allows us to edit it:
 
 ![](assets//images//phphonebook_4.png)
 
-we now only need to add an emergecy variable and we get the flag:
+we now only need to add an emergency variable and we get the flag:
 
 ![](assets//images//phphonebook_5.png)
 
@@ -1624,6 +1624,6 @@ with curl we can simply use the following command `curl -X POST --data "emergenc
 
 
 **Resources:**
-* File Inclusion Vulnrabilities: https://www.offensive-security.com/metasploit-unleashed/file-inclusion-vulnerabilities/
+* File Inclusion Vulnerabilities: https://www.offensive-security.com/metasploit-unleashed/file-inclusion-vulnerabilities/
 * HTTP request methods: https://www.w3schools.com/tags/ref_httpmethods.asp
 * Payload all the things - File Inclusion: https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/File%20Inclusion
