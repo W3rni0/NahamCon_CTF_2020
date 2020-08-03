@@ -703,6 +703,7 @@ Download the file below.\
 **flag{pR1m3s_4re_co0ler_Wh3n_pal1nDr0miC}**
 
 **Solution:** Now we get with the challenge a python script:
+
 ```python 3
 import base64
 num = 0
@@ -818,7 +819,7 @@ we can guess that this is an RSA encryption, I explained more about how RSA work
 
 and I explained why it works and how we can break the cipher:
 
->...for that we need to talk about factors, factors are numbers which can be divided only by 1 and himself (we are only talking about whole numbers), we have discovered that there are infinitely many factors and that we can represent any number as the multiplication of factors, but, we haven't discovered an efficient way to find out which factors make up a number, and some will even argue that there isn't an efficient way to do that (P vs. NP and all that), which means that if we take a big number, it will take days, months and even years to find out the factors which makes it, but, we have discovered efficient ways to find factors, so if I find 2 factors, which are favorably big, I multiply them and post the result on my feed to the public, it will take a lot of time for people to discover the factors that make up my number. But, and a big but, if they have a database of numbers and the factors that make them up they can easily find the factors for each numbers I will post, and as I explained before, if we can the factors we can easily calculate phi and consequently calculate d, the private key of RSA, and break the cipher, right now there are databases (listed below) with have the factors to all the numbers up to 60 digits (if I remember correctly), which is a lot but not enough to break modern RSA encryptions, but if we look at the challenge's parameters, we can see that n is awefully small, small enough that it most be in some databases...
+>...for that we need to talk about factors, factors are numbers which can be divided only by 1 and himself (we are only talking about whole numbers), we have discovered that there are infinitely many factors and that we can represent any number as the multiplication of factors, but, we haven't discovered an efficient way to find out which factors make up a number, and some will even argue that there isn't an efficient way to do that (P vs. NP and all that), which means that if we take a big number, it will take days, months and even years to find out the factors which makes it, but, we have discovered efficient ways to find factors, so if I find 2 factors, which are favorably big, I multiply them and post the result on my feed to the public, it will take a lot of time for people to discover the factors that make up my number. But, and a big but, if they have a database of numbers and the factors that make them up they can easily find the factors for each numbers I will post, and as I explained before, if we can the factors we can easily calculate phi and consequently calculate d, the private key of RSA, and break the cipher, right now there are databases (listed below) with have the factors to all the numbers up to 60 digits (if I remember correctly), which is a lot but not enough to break modern RSA encryptions, but if we look at the challenge's parameters, we can see that n is awfully small, small enough that it most be in some databases...
 
 if we search for the value of n in factorDB, a database for the factors of numbers, we can find factors for the value of n given to us:
 
@@ -1278,7 +1279,7 @@ Help! I can't make any sense out of what Dina is saying, can you??
 Connect with:
 `nc jh2i.com 50035`
 
-**Post CTF Writeup**
+**Post CTF Writeup**\
 **flag{dina_speaks_in_dna_and_you_do_too}**
 
 **Disclaimer:** I'll start of with a quick disclaimer, even though I ended solving it using frequency analysis and some common sense, I don't think what I did was the intention of the author, and I used the mapping john showed three or four times to validate a character and escape rabbit holes, though I think it can be done without using it at all if you have  time, and after validating the first few characters I could easily complete the rest myself.\
@@ -1461,6 +1462,82 @@ and oh boy did it worked, after a little more than an hour I succeeded in findin
 ![](assets//images//dina_2.png)
 
 actually the mapping is not spot-on for numbers but because the string only comprises of  letters this is not that crucial.
+
+## Rotten
+Ick, this salad doesn't taste too good!
+
+Connect with:\
+`nc jh2i.com 50034`
+
+**flag{now_you_know_your_caesars}**
+
+**Solution:** server response is ceaser cipher encrypted, code:
+
+```python 3
+from pwn import remote
+import re
+import re
+host, port = 'jh2i.com', 50034
+s = remote(host,port)
+flag = [''] * 32
+for _ in range(200):
+	question = s.recv()
+	answer = list(str(question)[2:-3])
+	for i in range(27):
+		for j in range(len(answer)):
+			if ord(answer[j]) >= ord('a') and ord(answer[j]) <= ord('z'):
+				answer[j] = chr((ord(answer[j]) - ord('a') + 1) % ( ord('z') - ord('a') + 1) + ord('a'))
+		plain = ''.join(answer)
+		if 'send back' in plain:
+			break
+	position = re.findall("[0-9]+",plain)
+	if len(position) > 0:
+		flag[int(position[0])] = plain[-2]
+		empty = [i for i in range(len(flag)) if flag[i] == '']
+		print(''.join(flag), end='\r\n')
+	s.send(plain)
+s.close()
+```
+
+## Really powerful Gnomes
+Only YOU can save the village!
+
+Connect with:
+`nc jh2i.com 50031`
+
+**flag{it_was_in_fact_you_that_was_really_powerful}**
+
+**Solution:** Automate going on adventure and buying weapons:
+
+```python 3
+from pwn import *
+import re
+prices = [1000,2000,10000,100000,10000]
+gold = 0
+def beautify_data(msg):
+	return str(msg)[2:-1].replace("\\n","\n")
+host, port = 'jh2i.com', 50031
+s = remote(host,port)
+for i in range(5):
+	response = beautify_data(s.recv())
+	if "flag" in response:
+		print(re.findall("flag{.*?}",response)[0])
+		exit(0)
+	s.send("6\n{}\n".format(i + 1))
+	while int(gold) < prices[i]:
+		response = beautify_data(s.recv())
+		if "flag" in response:
+			print(re.findall("flag{.*?}",response)[0])
+			exit(0)
+		gold = re.findall("[0-9]+",response)[1]
+		print("gold: " + gold)
+		s.send("{}\n".format(5 - i))
+s.send("1\n")
+if "flag" in response:
+	print(re.findall("flag{.*?}",response)[0])
+s.interactive()
+s.close()
+```
 
 ***
 
